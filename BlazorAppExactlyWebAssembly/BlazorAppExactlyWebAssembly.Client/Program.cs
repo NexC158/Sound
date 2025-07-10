@@ -1,17 +1,34 @@
 using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
-namespace BlazorAppExactlyWebAssembly.Client
+namespace BlazorAppExactlyWebAssembly.Client;
+
+
+
+public class Program
 {
-    internal class Program
+    public static string _dbg = "empty";
+
+    public static async Task Main(string[] args)
     {
-        static async Task Main(string[] args)
+        Console.WriteLine("in client main");
+        var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+        builder.Services.AddSingleton<ServerAPI>();
+
+        var app = builder.Build();
+
+        var api = app.Services.GetRequiredService<ServerAPI>();
+
+        Console.WriteLine("in client main 2");
+        var apiInitRes = await api.Init();
+        Console.WriteLine("in client main 3");
+        if (apiInitRes.isFailed)
         {
-            var builder = WebAssemblyHostBuilder.CreateDefault(args);
-
-            builder.Services.AddSingleton<ServerAPI>();
-
-            await builder.Build().RunAsync();
+            _dbg = apiInitRes.failedReaaon;
+            Console.WriteLine(apiInitRes.failedReaaon);
         }
+
+        await app.RunAsync();
     }
 }

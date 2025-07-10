@@ -1,4 +1,6 @@
 ﻿
+#if false
+
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
@@ -38,3 +40,5 @@ namespace BlazorAppExactlyWebAssembly.SignalRHubs
         //}
     }
 }
+
+#endif

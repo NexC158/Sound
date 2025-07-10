@@ -1,11 +1,16 @@
-﻿@page "/audiohub"
+﻿@page "/audioApp"
+@rendermode InteractiveWebAssembly
 
 @using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
+@* @using Microsoft.AspNetCore.SignalR.Client *@
 
+@inject ServerAPI _api
 @* @inject NavigationManager Navigation
 @inject IJSRuntime JS *@
-@inject ServerAPI _api
-@using Microsoft.AspNetCore.SignalR.Client
+
+<dev>@(Program._dbg)</dev>
+
+@* <dev>@(ServerAPI.BuildAndStartConnection_test())</dev> *@
 
 <button class="btn btn-primary" @onclick="SoundStreaming">@(isActive ? "Stop translate" : "Start translate")</button>
 
@@ -23,6 +28,8 @@
     //         Console.WriteLine($"OnInitializedAsync не прошел: {ex.Message}");
     //     }
     // }
+
+
 
     private async Task SoundStreaming()
     {

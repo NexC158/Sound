@@ -5,7 +5,7 @@ let audioWorkletNode;
 let source; /////// вот это проверить
 
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/audiohub")
+    .withUrl("/hub/audiohub")
     .build();
 
 connection.start();
