@@ -28,14 +28,14 @@ public class SignalRHub : Hub, ISignalRHub
         };
         _channel = Channel.CreateBounded<byte>(options);
     }
-    public async Task StartStreamingCommand(string connectionId)
+    public async Task StartStreamingCommand()
     {
-        await Clients.Client(connectionId).SendAsync("startTranslateAudio");
+        await Clients.All.SendAsync("startTranslateAudio");
     }
 
-    public async Task StopStreamingCommand(string connectionId)
+    public async Task StopStreamingCommand()
     {
-        await Clients.Client(connectionId).SendAsync("stopTranslateAudio");
+        await Clients.All.SendAsync("stopTranslateAudio");
     }
 
     public string GetMyConnectionId()

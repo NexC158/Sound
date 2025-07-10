@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppExactlyWebAssembly", "BlazorAppExactlyWebAssembly\BlazorAppExactlyWebAssembly\BlazorAppExactlyWebAssembly.csproj", "{5F94CF43-35DC-4968-889F-786DE383C702}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppExactlyWebAssembly.Client", "BlazorAppExactlyWebAssembly\BlazorAppExactlyWebAssembly.Client\BlazorAppExactlyWebAssembly.Client.csproj", "{2FEC8593-A345-42C1-A884-4438CD5BFC26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppExactlyWebAssemblyShared", "BlazorAppExactlyWebAssemblyShared1\BlazorAppExactlyWebAssemblyShared.csproj", "{3C97E4B2-1B84-46C5-84E1-16DE9921BAB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,15 @@ Global
 		{2FEC8593-A345-42C1-A884-4438CD5BFC26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FEC8593-A345-42C1-A884-4438CD5BFC26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FEC8593-A345-42C1-A884-4438CD5BFC26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C97E4B2-1B84-46C5-84E1-16DE9921BAB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C97E4B2-1B84-46C5-84E1-16DE9921BAB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C97E4B2-1B84-46C5-84E1-16DE9921BAB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C97E4B2-1B84-46C5-84E1-16DE9921BAB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8D629A06-CA14-4188-9198-2986E8016623}
 	EndGlobalSection
 EndGlobal
