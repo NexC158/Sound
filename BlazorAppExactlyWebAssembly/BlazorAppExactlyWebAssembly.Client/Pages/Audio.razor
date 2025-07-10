@@ -1,7 +1,10 @@
 ﻿@page "/audiohub"
 
+@using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
+
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject ServerAPI _api
 @using Microsoft.AspNetCore.SignalR.Client
 
 <button class="btn btn-primary" @onclick="SoundStreaming">@(isActive ? "Stop translate" : "Start translate")</button>
@@ -16,6 +19,7 @@
     {
         try
         {
+            
             _connection = new HubConnectionBuilder()
             .WithUrl(Navigation.ToAbsoluteUri("/audiohub"))
             .Build();
