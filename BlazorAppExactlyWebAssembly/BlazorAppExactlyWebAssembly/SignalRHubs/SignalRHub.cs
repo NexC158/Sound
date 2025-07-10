@@ -2,11 +2,9 @@
 using System.Net;
 using System.Threading.Channels;
 using Microsoft.AspNetCore.SignalR;
-using BlazorAppExactlyWebAssembly.SignalRHubServer;
 using System.Threading.Tasks.Dataflow;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace BlazorAppExactlyWebAssembly.SignalrHubServer;
+namespace BlazorAppExactlyWebAssembly.SignalRHubs;
 
 public class SignalRHub : Hub, ISignalRHub
 {

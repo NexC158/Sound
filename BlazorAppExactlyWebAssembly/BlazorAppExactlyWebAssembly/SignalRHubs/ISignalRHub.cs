@@ -1,7 +1,8 @@
 ﻿using System.Threading.Channels;
 using TypedSignalR.Client;
 
-namespace BlazorAppExactlyWebAssembly.SignalRHubServer;
+namespace BlazorAppExactlyWebAssembly.SignalRHubs;
+
 [Hub]
 public interface ISignalRHub
 {

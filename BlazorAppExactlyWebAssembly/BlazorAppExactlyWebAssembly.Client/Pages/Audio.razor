@@ -2,8 +2,8 @@
 
 @using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 
-@inject NavigationManager Navigation
-@inject IJSRuntime JS
+@* @inject NavigationManager Navigation
+@inject IJSRuntime JS *@
 @inject ServerAPI _api
 @using Microsoft.AspNetCore.SignalR.Client
 
@@ -12,46 +12,30 @@
 @code {
     private bool isActive = false;
 
-    private HubConnection? _connection;
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            
-            _connection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri("/audiohub"))
-            .Build();
-
-            Console.WriteLine($"connection before in Audio.razor {_connection.State}");
-            await _connection.StartAsync();
-            Console.WriteLine($"connection after in Audio.razor {_connection.State}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"OnInitializedAsync: {ex.Message}");
-            await Task.Delay(1000);
-        }
-
-    }
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     try
+    //     {
+    //         await _api.StartConnection();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine($"OnInitializedAsync не прошел: {ex.Message}");
+    //     }
+    // }
 
     private async Task SoundStreaming()
     {
-        if (_connection is not null)
+        if (_api is not null)
         {
-            string myConnectionId = await _connection.InvokeAsync<string>("GetMyConnectionId");
-
-            Console.WriteLine("connection in Audio.razor SoundStreaming {_connection.State}");
-
             if (isActive is false)
             {
                 isActive = true;
-                await _connection.SendAsync("StartStreamingCommand", myConnectionId);
+                await _api.StartStreamingCommand();
             }
             else
             {
-                await _connection.SendAsync("StopStreamingCommand", myConnectionId);
+                await _api.StopStreamingCommand();
             }
             isActive = !isActive;
         }

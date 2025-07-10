@@ -1,6 +1,7 @@
 using BlazorAppExactlyWebAssembly.Client.Pages;
 using BlazorAppExactlyWebAssembly.Components;
-using BlazorAppExactlyWebAssembly.SignalrHubServer;
+using BlazorAppExactlyWebAssembly.SignalRHubs;
+
 
 namespace BlazorAppExactlyWebAssembly
 {
@@ -41,6 +42,8 @@ namespace BlazorAppExactlyWebAssembly
                 .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
             app.MapHub<SignalRHub>("/audiohub");
+
+            app.MapHub<SignalRHubForBlazor>("/SignalRHubForBlazor");
 
 
             app.Run();
