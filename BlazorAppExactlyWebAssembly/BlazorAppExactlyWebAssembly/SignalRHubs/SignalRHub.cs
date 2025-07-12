@@ -26,12 +26,12 @@ public class SignalRHub : Hub, ISignalRHub
         };
         _channel = Channel.CreateBounded<byte>(options);
     }
-    public async Task StartStreamingCommand()
+    public async Task SignalRHubStartStreamingCommand()
     {
         await Clients.All.SendAsync("startTranslateAudio");
     }
 
-    public async Task StopStreamingCommand()
+    public async Task SignalRHubStopStreamingCommand()
     {
         await Clients.All.SendAsync("stopTranslateAudio");
     }
@@ -44,14 +44,14 @@ public class SignalRHub : Hub, ISignalRHub
     public override Task OnConnectedAsync()
     {
         _logger.LogTrace("Logger: connection opened: {this.Context.ConnectionId}", this.Context.ConnectionId);
-        Console.WriteLine($"connection (OnConnectedAsync) opened: {this.Context.ConnectionId}");
+        Console.WriteLine($"SignalRHub connection (OnConnectedAsync) opened: {this.Context.ConnectionId}");
         return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         _logger.LogTrace("Logger: connection closed: {this.Context.ConnectionId}", this.Context.ConnectionId);
-        Console.WriteLine($"connection (OnDisconnectedAsync) closed: {this.Context.ConnectionId}");
+        Console.WriteLine($"SignalRHub connection (OnDisconnectedAsync) closed: {this.Context.ConnectionId}");
         return base.OnDisconnectedAsync(exception);
     }
 

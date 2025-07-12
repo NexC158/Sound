@@ -19,7 +19,18 @@ namespace BlazorAppExactlyWebAssembly
 
             builder.Services.AddSignalR();
 
-            builder.Services.AddTransient<ServerAPI>();
+            builder.Services.AddTransient<ServerAPI>(); // some experiments AddTransient or AddScoped
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials()
+                          .WithOrigins("https://localhost:7069");
+                });
+            });
 
             var app = builder.Build();
 
@@ -35,6 +46,9 @@ namespace BlazorAppExactlyWebAssembly
                 app.UseHsts();
             }
 
+
+            app.UseCors();
+
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
@@ -44,12 +58,16 @@ namespace BlazorAppExactlyWebAssembly
                 .AddInteractiveWebAssemblyRenderMode()
                 .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
+
             app.MapHub<SignalRHub>("/hubs/audiohub");
-
             app.MapHub<SignalRHubForBlazor>("/hubs/blazor");
-
+            
 
             app.Run();
         }
     }
 }
+
+/*Ћогика котора€ мне нужна: открываю соединение через SignalRHubForBlazor по пути /hubs/blazor при открытии страницы. Ёто соединение должно жить пока открыта страница. ѕотом когда € нажимаю на кнопку 
+<button class= "btn btn-primary" @onclick = "SoundStreaming" >@(isActive ? "Stop translate" : "Start translate") </ button >
+ƒолжно открытьс€ другое соединение: app.MapHub<SignalRHub>("/hubs/audiohub");  оторое должно будет передавать звук с микрофона*/

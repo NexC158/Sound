@@ -14,7 +14,7 @@ namespace BlazorAppExactlyWebAssembly.SignalRHubs
         public SignalRHubForBlazor()
         {
            // _connection = new HubConnectionBuilder()
-           //.WithUrl(new Uri("https://127.0.0.1:10000/audiohub"))
+           //.WithUrl(new Uri("https://127.0.0.1:10000/"))
            //.Build();
         }
 

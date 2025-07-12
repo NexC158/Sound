@@ -2,50 +2,69 @@
 @rendermode InteractiveWebAssembly
 
 @using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
-@* @using Microsoft.AspNetCore.SignalR.Client *@
+ @using Microsoft.AspNetCore.SignalR.Client 
 
 @inject ServerAPI _api
-@* @inject NavigationManager Navigation
-@inject IJSRuntime JS *@
+@inject NavigationManager Navigation
+@* @inject IJSRuntime JS *@
 
 <dev>@(Program._dbg)</dev>
 
-@* <dev>@(ServerAPI.BuildAndStartConnection_test())</dev> *@
+@* <dev>@(ServerAPI.BuildAndStartConnection_test())</dev>  *@
 
-<button class="btn btn-primary" @onclick="SoundStreaming">@(isActive ? "Stop translate" : "Start translate")</button>
+@* <button class="btn btn-primary" @onclick="SoundStreaming">@(isActive ? "Stop translate" : "Start translate")</button> *@
+
+<button class="btn btn-primary" @onclick="StartTranslateSound">@("Start translate sound")</button>
+
+<button class="btn btn-primary" @onclick="StopTranslateSound">@("Stop translate sound")</button>
 
 @code {
-    private bool isActive = false;
+    // private bool isActive = false;
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     try
-    //     {
-    //         await _api.StartConnection();
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine($"OnInitializedAsync не прошел: {ex.Message}");
-    //     }
-    // }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await _api.InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"OnInitializedAsync не прошел: {ex.Message}");
+        }
+    }
 
 
-
-    private async Task SoundStreaming()
+    private async Task StartTranslateSound()
     {
         if (_api is not null)
         {
-            if (isActive is false)
-            {
-                isActive = true;
-                await _api.StartStreamingCommand();
-            }
-            else
-            {
-                await _api.StopStreamingCommand();
-            }
-            isActive = !isActive;
+            await _api.StartStreamingCommand();
         }
-        return;
     }
+
+    private async Task StopTranslateSound()
+    {
+        if (_api is not null)
+        {
+            await _api.StopStreamingCommand();
+        }
+    }
+
+
+    // private async Task SoundStreaming()
+    // {
+    //     if (_api is not null)
+    //     {
+    //         if (isActive is false)
+    //         {
+    //             await _api.StartStreamingCommand();
+    //         }
+    //         else
+    //         {
+    //             await _api.StopStreamingCommand();
+    //         }
+    //         isActive = !isActive;
+    //     }
+    //     return;
+    // }
 }

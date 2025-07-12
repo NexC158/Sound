@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Remove="wwwroot\js\serverApi\BlazorAppExactlyWebAssembly.SignalRHubServer.ts" />
+    <TypeScriptCompile Remove="wwwroot\js\serverApi\index.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
 	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.6" />
@@ -24,7 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BlazorAppExactlyWebAssemblyShared1\BlazorAppExactlyWebAssemblyShared.csproj" />
+    <None Include="wwwroot\js\serverApi\BlazorAppExactlyWebAssembly.SignalRHubServer.ts" />
+    <None Include="wwwroot\js\serverApi\index.ts" />
   </ItemGroup>
 
 </Project>

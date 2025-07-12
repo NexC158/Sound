@@ -4,21 +4,30 @@ let audioContext;
 let audioWorkletNode;
 let source; /////// вот это проверить
 
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/hub/audiohub")
+alert('запустился audioClient.js');
+
+const connectionForAudioHub = new signalR.HubConnectionBuilder()
+    .withUrl("https://localhost:7069/hubs/blazor")
     .build();
 
-connection.start();
 
-connection.on("startTranslateAudio", async () => {
 
+connectionForAudioHub.on("startTranslateAudio", async () => {
+
+    alert('была нажата кнопка на начало трансляции звука: должен сработать connection.on("startTranslateAudio"');
     await startTranslate();
+    
 });
 
-connection.on("stopTranslateAudio", () => {
+connectionForAudioHub.on("stopTranslateAudio", () => {
 
+    alert('сработал connection.on("stopTranslateAudio"');
     stopTranslate();
 });
+
+connectionForAudioHub.start(); // вызываю после обработчиков чтобы они не получили никаких сообщений до регистрации
+alert('/hubs/audiohub');
+alert(connectionForAudioHub.state);
 
 
 async function requestMicrophoneAccess() {
@@ -36,6 +45,7 @@ async function requestMicrophoneAccess() {
 
 async function startTranslate() {
 
+    alert('вошел в функцию startTranslate');
     if (!mediaStream) {
         await requestMicrophoneAccess();
         if (!mediaStream) return;
@@ -45,11 +55,11 @@ async function startTranslate() {
     alert("before subject = new signalR.Subject();");
     subject = new signalR.Subject();
 
-    let dbg2 = await connection.invoke("GetHelloWorld");
+    let dbg2 = await connectionForAudioHub.invoke("GetHelloWorld");
     alert(dbg2);
-    alert(connection.state);
+    alert(connectionForAudioHub.state);
 
-    connection.send("GetBytesFromAudioStream", subject);
+    connectionForAudioHub.send("GetBytesFromAudioStream", subject);
 
     audioContext = new window.AudioContext({ sampleRate: 8000 });
 
@@ -78,7 +88,7 @@ async function startTranslate() {
     //    }
     //};
 
-    audioWorkletNode.port.onmessage = e => subject.next(e.data); // вместо верхнего пробую
+    audioWorkletNode.port.onmessage = e => subject.next(e.data); // пробую вместо верхнего 
 
     audioWorkletNode.connect(audioContext.destination);// если без destination, то обработка будет идти не в средство вывода а на сервер
 
@@ -88,6 +98,6 @@ function stopTranslate() {
     if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
     if (audioContext) audioContext.close();
     if (subject) subject.complete();
-    if (connection) connection.stop();
+    if (connection) connectionForAudioHub.stop();
     
 }

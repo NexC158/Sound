@@ -4,12 +4,16 @@
 // @ts-nocheck
 import type { IStreamResult, Subject } from '@microsoft/signalr';
 
-export type IAudioHub = {
+export type ISignalRHub = {
     /**
     * @param stream Transpiled from System.Threading.Channels.ChannelReader<byte>
     * @returns Transpiled from System.Threading.Tasks.Task
     */
-    uploadAudioStream(stream: Subject<number>): Promise<void>;
+    getBytesFromAudioStream(stream: Subject<number>): Promise<void>;
+    /**
+    * @returns Transpiled from System.Threading.Tasks.Task
+    */
+    createAndSendAudioChunk(): Promise<void>;
     /**
     * @returns Transpiled from System.Threading.Tasks.Task<string>
     */

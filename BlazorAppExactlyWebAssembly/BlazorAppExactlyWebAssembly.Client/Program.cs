@@ -14,20 +14,20 @@ public class Program
         Console.WriteLine("in client main");
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-        builder.Services.AddSingleton<ServerAPI>();
+        builder.Services.AddSingleton<ServerAPI>(); // some experiments AddTransient or AddScoped or AddSingleton
 
         var app = builder.Build();
 
-        var api = app.Services.GetRequiredService<ServerAPI>();
+        app.Services.GetRequiredService<ServerAPI>();
 
         Console.WriteLine("in client main 2");
-        var apiInitRes = await api.Init();
+        //var apiInitRes = await api.Init();
         Console.WriteLine("in client main 3");
-        if (apiInitRes.isFailed)
-        {
-            _dbg = apiInitRes.failedReaaon;
-            Console.WriteLine(apiInitRes.failedReaaon);
-        }
+        //if (apiInitRes.isFailed)
+        //{
+        //    _dbg = apiInitRes.failedReaaon;
+        //    Console.WriteLine(apiInitRes.failedReaaon);
+        //}
 
         await app.RunAsync();
     }

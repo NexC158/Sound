@@ -52,30 +52,62 @@ var ReceiverMethodSubscription = /** @class */ (function () {
     return ReceiverMethodSubscription;
 }());
 exports.getHubProxyFactory = (function (hubType) {
-    if (hubType === "IAudioHub") {
-        return IAudioHub_HubProxyFactory.Instance;
+    if (hubType === "ISignalRHub") {
+        return ISignalRHub_HubProxyFactory.Instance;
     }
 });
 exports.getReceiverRegister = (function (receiverType) {
 });
 // HubProxy
-var IAudioHub_HubProxyFactory = /** @class */ (function () {
-    function IAudioHub_HubProxyFactory() {
+var ISignalRHub_HubProxyFactory = /** @class */ (function () {
+    function ISignalRHub_HubProxyFactory() {
         this.createHubProxy = function (connection) {
-            return new IAudioHub_HubProxy(connection);
+            return new ISignalRHub_HubProxy(connection);
         };
     }
-    IAudioHub_HubProxyFactory.Instance = new IAudioHub_HubProxyFactory();
-    return IAudioHub_HubProxyFactory;
+    ISignalRHub_HubProxyFactory.Instance = new ISignalRHub_HubProxyFactory();
+    return ISignalRHub_HubProxyFactory;
 }());
-var IAudioHub_HubProxy = /** @class */ (function () {
-    function IAudioHub_HubProxy(connection) {
+var ISignalRHub_HubProxy = /** @class */ (function () {
+    function ISignalRHub_HubProxy(connection) {
         var _this = this;
         this.connection = connection;
-        this.uploadAudioStream = function (stream) { return __awaiter(_this, void 0, void 0, function () {
+        this.startStreamingCommand = function (connectionId) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.connection.send("UploadAudioStream", stream)];
+                    case 0: return [4 /*yield*/, this.connection.invoke("StartStreamingCommand", connectionId)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        }); };
+        this.stopStreamingCommand = function (connectionId) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connection.invoke("StopStreamingCommand", connectionId)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        }); };
+        this.getMyConnectionId = function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connection.invoke("GetMyConnectionId")];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        }); };
+        this.getBytesFromAudioStream = function (stream) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connection.send("GetBytesFromAudioStream", stream)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        }); };
+        this.createAndSendAudioChunk = function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connection.invoke("CreateAndSendAudioChunk")];
                     case 1: return [2 /*return*/, _a.sent()];
                 }
             });
@@ -89,6 +121,6 @@ var IAudioHub_HubProxy = /** @class */ (function () {
             });
         }); };
     }
-    return IAudioHub_HubProxy;
+    return ISignalRHub_HubProxy;
 }());
 // Receiver

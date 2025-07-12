@@ -3,7 +3,7 @@
 /* tslint:disable */
 // @ts-nocheck
 import type { HubConnection, IStreamResult, Subject } from '@microsoft/signalr';
-import type { ISignalRHub } from './BlazorAppExactlyWebAssembly.SignalRHubServer';
+import type { ISignalRHub } from './BlazorAppExactlyWebAssembly.SignalRHubs';
 
 
 // components
@@ -73,18 +73,6 @@ class ISignalRHub_HubProxyFactory implements HubProxyFactory<ISignalRHub> {
 class ISignalRHub_HubProxy implements ISignalRHub {
 
     public constructor(private connection: HubConnection) {
-    }
-
-    public readonly startStreamingCommand = async (connectionId: string): Promise<void> => {
-        return await this.connection.invoke("StartStreamingCommand", connectionId);
-    }
-
-    public readonly stopStreamingCommand = async (connectionId: string): Promise<void> => {
-        return await this.connection.invoke("StopStreamingCommand", connectionId);
-    }
-
-    public readonly getMyConnectionId = async (): string => {
-        return await this.connection.invoke("GetMyConnectionId");
     }
 
     public readonly getBytesFromAudioStream = async (stream: Subject<number>): Promise<void> => {
