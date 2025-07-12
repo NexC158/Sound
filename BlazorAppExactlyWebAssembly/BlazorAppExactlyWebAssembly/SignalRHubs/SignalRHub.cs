@@ -26,15 +26,15 @@ public class SignalRHub : Hub, ISignalRHub
         };
         _channel = Channel.CreateBounded<byte>(options);
     }
-    public async Task SignalRHubStartStreamingCommand()
-    {
-        await Clients.All.SendAsync("startTranslateAudio");
-    }
+    //public async Task SignalRHubStartStreamingCommand()
+    //{
+    //    await Clients.All.SendAsync("startTranslateAudio");
+    //}
 
-    public async Task SignalRHubStopStreamingCommand()
-    {
-        await Clients.All.SendAsync("stopTranslateAudio");
-    }
+    //public async Task SignalRHubStopStreamingCommand()
+    //{
+    //    await Clients.All.SendAsync("stopTranslateAudio");
+    //}
 
     public string GetMyConnectionId()
     {
@@ -55,12 +55,22 @@ public class SignalRHub : Hub, ISignalRHub
         return base.OnDisconnectedAsync(exception);
     }
 
+    public async Task ReceiveAudioChunk(byte[] chunk) // короче хз, ничего не идет
+    {
+        Console.WriteLine($"чанк длиной {chunk.Length}");
+        foreach (var b in chunk)
+        {
+            Console.Write($"{b} ");
+        }    
+        Console.WriteLine();
+    }
 
     public async Task GetBytesFromAudioStream(ChannelReader<byte> stream)
     {
         // this.Context.ConnectionId
         Console.WriteLine("STR: start stream");
         var writer = _channel.Writer;
+        //await CreateAndSendAudioChunk();
         try
         {
             Console.WriteLine("stream content: ");

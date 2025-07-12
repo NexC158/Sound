@@ -19,7 +19,8 @@ namespace BlazorAppExactlyWebAssembly
 
             builder.Services.AddSignalR();
 
-            builder.Services.AddTransient<ServerAPI>(); // some experiments AddTransient or AddScoped
+            builder.Services.AddTransient<ServerAPI>(); // some experiments AddTransient or AddScoped of AddSingleton
+            builder.Services.AddTransient<HubService>();
 
             builder.Services.AddCors(options =>
             {

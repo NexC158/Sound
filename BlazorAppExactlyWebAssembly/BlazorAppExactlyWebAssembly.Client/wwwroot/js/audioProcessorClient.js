@@ -16,7 +16,7 @@ class AudioProcessorClient extends AudioWorkletProcessor { // пробую вм�
         const channelData = inputs[0][0];
         if (channelData) {
             const pcm = new Int16Array(channelData.length); // Float32 → Int16 PCM
-            for (let i = 0; i < channelData.length; i++)
+            for (let i = 0; i < channelData.length; i++) // channelData.length
                 pcm[i] = Math.max(-1, Math.min(1, channelData[i])) * 0x7FFF;
             this.port.postMessage(new Uint8Array(pcm.buffer));
         }

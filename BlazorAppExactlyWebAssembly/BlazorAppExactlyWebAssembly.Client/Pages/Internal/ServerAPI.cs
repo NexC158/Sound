@@ -18,8 +18,6 @@ public class ServerAPI : IAsyncDisposable
           .WithUrl("https://localhost:7069/hubs/blazor")
           .Build();
 
-        _connection.On("")
-
         //_connection.StartAsync().Wait();
 
         //.WithUrl("https://localhost:7069/hubs/blazor") //_navigationManager.ToAbsoluteUri("/hubs/blazor").WithAutomaticReconnect()

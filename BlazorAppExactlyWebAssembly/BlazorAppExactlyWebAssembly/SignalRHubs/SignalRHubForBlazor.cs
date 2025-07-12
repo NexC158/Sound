@@ -7,15 +7,25 @@ namespace BlazorAppExactlyWebAssembly.SignalRHubs;
 
 public class SignalRHubForBlazor : Hub
 {
+    private readonly HubService _hubService;
+
+    public SignalRHubForBlazor(HubService hubService)
+    {
+        _hubService = hubService;
+    }
+
     public async Task HubStartStreamingCommand()
     {
         Console.WriteLine("SignalRHubForBlazor HubStartStreamingCommand ");
-        await Clients.All.SendAsync("startTranslateAudio");
+
+        await _hubService.TransferStartInvoke("SignalRHubStartStreamingCommand");
+        //await Clients.All.SendAsync("startTranslateAudio");
     }        
     public async Task HubStopStreamingCommand()
     {
         Console.WriteLine("SignalRHubForBlazor HubStopStreamingCommand ");
-        await Clients.All.SendAsync("stopTranslateAudio");
+        await _hubService.TransferStartInvoke("SignalRHubStopStreamingCommand");
+        //await Clients.All.SendAsync("stopTranslateAudio");
     }
 
     public override Task OnConnectedAsync()
@@ -39,10 +49,10 @@ public class SignalRHubForBlazor : Hub
         return base.OnDisconnectedAsync(exception);
     }
 
-    public async Task<string> GetHelloWorld()
-    {
-        Console.WriteLine($"Hello world: {this.Context.ConnectionId}");
-        Console.WriteLine($"features: [{string.Join(", ", this.Context.Features)}]");
-        return "hello word";
-    }
+    //public async Task<string> GetHelloWorld()
+    //{
+    //    Console.WriteLine($"Hello world: {this.Context.ConnectionId}");
+    //    Console.WriteLine($"features: [{string.Join(", ", this.Context.Features)}]");
+    //    return "hello word";
+    //}
 }

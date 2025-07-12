@@ -7,26 +7,25 @@ let source; /////// вот это проверить
 alert('запустился audioClient.js');
 
 const connectionForAudioHub = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:7069/hubs/blazor")
+    .withUrl("https://localhost:7069/hubs/audiohub")
     .build();
 
 
 
-connectionForAudioHub.on("startTranslateAudio", async () => {
+connectionForAudioHub.on("SignalRHubStartStreamingCommand", async () => {
 
     alert('была нажата кнопка на начало трансляции звука: должен сработать connection.on("startTranslateAudio"');
     await startTranslate();
     
 });
 
-connectionForAudioHub.on("stopTranslateAudio", () => {
+connectionForAudioHub.on("SignalRHubStopStreamingCommand", () => {
 
     alert('сработал connection.on("stopTranslateAudio"');
     stopTranslate();
 });
 
 connectionForAudioHub.start(); // вызываю после обработчиков чтобы они не получили никаких сообщений до регистрации
-alert('/hubs/audiohub');
 alert(connectionForAudioHub.state);
 
 
@@ -59,7 +58,7 @@ async function startTranslate() {
     alert(dbg2);
     alert(connectionForAudioHub.state);
 
-    connectionForAudioHub.send("GetBytesFromAudioStream", subject);
+    connectionForAudioHub.send("ReceiveAudioChunk", subject); //  GetBytesFromAudioStream
 
     audioContext = new window.AudioContext({ sampleRate: 8000 });
 
@@ -90,7 +89,7 @@ async function startTranslate() {
 
     audioWorkletNode.port.onmessage = e => subject.next(e.data); // пробую вместо верхнего 
 
-    audioWorkletNode.connect(audioContext.destination);// если без destination, то обработка будет идти не в средство вывода а на сервер
+    audioWorkletNode.connect(audioContext);// если без .destination, то обработка будет идти не в средство вывода а на сервер
 
 }
 
