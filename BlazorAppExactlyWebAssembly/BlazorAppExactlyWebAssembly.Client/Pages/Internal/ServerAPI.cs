@@ -92,15 +92,15 @@ public class ServerAPI : IAsyncDisposable
 
     public async Task StartStreamingCommand()
     {
-        Console.WriteLine("SignalRHubForBlazor HubStartStreamingCommand ... ");
+        Console.WriteLine("ServerAPI StartStreamingCommand ... ");
         await _connection.InvokeAsync("HubStartStreamingCommand");
-        Console.WriteLine("SignalRHubForBlazor HubStartStreamingCommand done");
+        Console.WriteLine("ServerAPI StartStreamingCommand done");
     }
     public async Task StopStreamingCommand()
     {
-        Console.WriteLine("SignalRHubForBlazor HubStopStreamingCommand ... ");
+        Console.WriteLine("ServerAPI StopStreamingCommand ... ");
         await _connection.InvokeAsync("HubStopStreamingCommand");
-        Console.WriteLine("SignalRHubForBlazor HubStopStreamingCommand done");
+        Console.WriteLine("ServerAPI StopStreamingCommand done");
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()

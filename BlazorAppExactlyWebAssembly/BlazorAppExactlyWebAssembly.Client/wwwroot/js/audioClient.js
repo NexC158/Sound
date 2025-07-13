@@ -1,8 +1,10 @@
-﻿let subject;
-let mediaStream = null;
-let audioContext;
-let audioWorkletNode;
+﻿let mediaStream = null;
+let audioContext = null;;
+let audioWorkletNode = null;;
 let source; /////// вот это проверить
+
+let isTransmitting = false; // Флаг активности передачи
+let portHandler = null; 
 
 alert('запустился audioClient.js');
 
@@ -10,24 +12,20 @@ const connectionForAudioHub = new signalR.HubConnectionBuilder()
     .withUrl("https://localhost:7069/hubs/audiohub")
     .build();
 
-
-
 connectionForAudioHub.on("SignalRHubStartStreamingCommand", async () => {
 
-    alert('была нажата кнопка на начало трансляции звука: должен сработать connection.on("startTranslateAudio"');
+    //alert('была нажата кнопка на начало трансляции звука: должен сработать startTranslate()');
     await startTranslate();
     
 });
 
 connectionForAudioHub.on("SignalRHubStopStreamingCommand", () => {
 
-    alert('сработал connection.on("stopTranslateAudio"');
+    //alert('сработал connection.on("stopTranslateAudio"');
     stopTranslate();
 });
 
 connectionForAudioHub.start(); // вызываю после обработчиков чтобы они не получили никаких сообщений до регистрации
-alert(connectionForAudioHub.state);
-
 
 async function requestMicrophoneAccess() {
 
@@ -35,7 +33,7 @@ async function requestMicrophoneAccess() {
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            alert('Доступ к микрофону получен!');
+            //alert('Доступ к микрофону получен!');
         } catch (err) {
             alert('Нет доступа к микрофону: ' + err);
         }
@@ -44,21 +42,24 @@ async function requestMicrophoneAccess() {
 
 async function startTranslate() {
 
-    alert('вошел в функцию startTranslate');
+    if (isTransmitting) {
+
+        console.log('Передача уже запущена');
+        return;
+    }
+    await requestMicrophoneAccess();
     if (!mediaStream) {
-        await requestMicrophoneAccess();
-        if (!mediaStream) return;
+        return;
     }
 
+    if (audioContext) {
+        await audioContext.close(); // закрываю на всякий случай, если он уже есть (на случай повторного старта)
+        audioContext = null;
+    }
 
-    alert("before subject = new signalR.Subject();");
-    subject = new signalR.Subject();
+    //subject = new signalR.Subject();
 
-    let dbg2 = await connectionForAudioHub.invoke("GetHelloWorld");
-    alert(dbg2);
-    alert(connectionForAudioHub.state);
-
-    connectionForAudioHub.send("ReceiveAudioChunk", subject); //  GetBytesFromAudioStream
+    //connectionForAudioHub.send("ReceiveAudioChunk", subject); //  GetBytesFromAudioStream
 
     audioContext = new window.AudioContext({ sampleRate: 8000 });
 
@@ -68,7 +69,9 @@ async function startTranslate() {
     /*source = */audioContext.createMediaStreamSource(mediaStream).connect(audioWorkletNode);
     /*source.connect(audioWorkletNode);*/
 
-    
+    audioWorkletNode.connect(audioContext.destination);// если без destination, то обработка будет идти не в средство вывода а на сервер
+
+
 
     //audioWorkletNode.port.onmessage = (event) => { // обработчик на получение сообщений из аудиопроцессора audioProcessor
     //    try {
@@ -87,16 +90,65 @@ async function startTranslate() {
     //    }
     //};
 
-    audioWorkletNode.port.onmessage = e => subject.next(e.data); // пробую вместо верхнего 
+    ///audioWorkletNode.port.onmessage = e => subject.next(e.data); // пробую вместо верхнего
 
-    audioWorkletNode.connect(audioContext);// если без .destination, то обработка будет идти не в средство вывода а на сервер
+    const CHUNK_SIZE = 8000;
 
+    const data = 8000;
+
+    
+
+    portHandler = e => {
+
+        if (!isTransmitting) return;
+        const data = new Uint8Array(e.data);
+        
+        for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+            const chunk = data.slice(i, i + CHUNK_SIZE);
+            console.log('чанк в audioWorkletNode.port.onmessage:::', chunk);
+            connectionForAudioHub.send("ReceiveAudioChunk", chunk);
+        }
+    };
+
+    audioWorkletNode.port.onmessage = portHandler;
+    isTransmitting = true;
+
+    //audioWorkletNode.port.onmessage = e => {
+    //    connectionForAudioHub.send("ReceiveAudioChunk", e.data);
+    //};
 }
 
 function stopTranslate() {
+
     if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
     if (audioContext) audioContext.close();
-    if (subject) subject.complete();
-    if (connection) connectionForAudioHub.stop();
-    
+    //if (subject) subject.complete();
+    if (connectionForAudioHub) connectionForAudioHub.stop();
+}
+
+function stopTranslate() {
+    if (!isTransmitting) {
+        console.log('Передача уже остановлена');
+        return;
+    }
+    isTransmitting = false;
+
+    // Отключаем обработчик, чтобы не отправлять чанки
+    if (audioWorkletNode && portHandler) {
+        audioWorkletNode.port.onmessage = null;
+    }
+
+    // Если нужно полностью освободить микрофон (а не только треки (до конца не понял))
+    //if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+    //mediaStream = null;
+
+    // Можно закрыть аудиоконтекст, если не нужен до следующего старта:
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+    }
+    audioWorkletNode = null;
+    portHandler = null;
+
+    console.log('Передача звука остановлена, но соединение осталось открытым');
 }

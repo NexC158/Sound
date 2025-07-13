@@ -1,5 +1,5 @@
 ﻿@page "/audioApp"
-@rendermode InteractiveWebAssembly
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false)) // либо так для каждого компонента СМОТРИ App.razor
 
 @using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
  @using Microsoft.AspNetCore.SignalR.Client 
