@@ -61,7 +61,7 @@ async function startTranslate() {
 
     //connectionForAudioHub.send("ReceiveAudioChunk", subject); //  GetBytesFromAudioStream
 
-    audioContext = new window.AudioContext({ sampleRate: 8000 });
+    audioContext = new window.AudioContext({ sampleRate: 16000 });
 
     await audioContext.audioWorklet.addModule('js/audioProcessorClient.js');
     audioWorkletNode = new AudioWorkletNode(audioContext, 'audioProcessorClient');
@@ -92,21 +92,22 @@ async function startTranslate() {
 
     ///audioWorkletNode.port.onmessage = e => subject.next(e.data); // пробую вместо верхнего
 
-    const CHUNK_SIZE = 8000;
+    const CHUNK_SIZE = 512; // 1024 2048 4096
 
-    const data = 8000;
+    portHandler = e => { // вот это кое-как работает
 
-    
+        if (!isTransmitting) {
 
-    portHandler = e => {
+            return;
+        }
 
-        if (!isTransmitting) return;
-        const data = new Uint8Array(e.data);
+        const data = new Uint8Array(1024);
         
         for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+
             const chunk = data.slice(i, i + CHUNK_SIZE);
             console.log('чанк в audioWorkletNode.port.onmessage:::', chunk);
-            connectionForAudioHub.send("ReceiveAudioChunk", chunk);
+            connectionForAudioHub.on("ReceiveAudioChunk", chunk);
         }
     };
 
@@ -116,14 +117,6 @@ async function startTranslate() {
     //audioWorkletNode.port.onmessage = e => {
     //    connectionForAudioHub.send("ReceiveAudioChunk", e.data);
     //};
-}
-
-function stopTranslate() {
-
-    if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
-    if (audioContext) audioContext.close();
-    //if (subject) subject.complete();
-    if (connectionForAudioHub) connectionForAudioHub.stop();
 }
 
 function stopTranslate() {
@@ -152,3 +145,5 @@ function stopTranslate() {
 
     console.log('Передача звука остановлена, но соединение осталось открытым');
 }
+
+

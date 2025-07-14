@@ -1,15 +1,34 @@
-﻿class AudioProcessorClient extends AudioWorkletProcessor {
-    process(inputs) {
-
-        const input = inputs[0]; // первый канал из первого входа
-        if (input && input.length > 0) {
-
-            this.port.postMessage(input[0].slice()); // отправляю сырые PCM данные
+﻿
+class AudioProcessorClient extends AudioWorkletProcessor { // вот это со звуком в наушники
+    process(inputs, outputs) {
+        const input = inputs[0];
+        const output = outputs[0];
+        if (input && input.length > 0 && output && output.length > 0) {
+            // копирую данные из входа в выход для каждого канала
+            for (let channel = 0; channel < input.length; ++channel) {
+                output[channel].set(input[channel]);
+            }
+            // дополнительно отправляю данные в порт, если нужно видеть байты
+            this.port.postMessage(input[0].slice());
         }
         return true;
     }
 }
 registerProcessor('audioProcessorClient', AudioProcessorClient);
+
+
+//class AudioProcessorClient extends AudioWorkletProcessor {
+//    process(inputs) {
+
+//        const input = inputs[0]; // первый канал из первого входа
+//        if (input && input.length > 0) {
+
+//            this.port.postMessage(input[0].slice()); // отправляю сырые PCM данные
+//        }
+//        return true;
+//    }
+//}
+//registerProcessor('audioProcessorClient', AudioProcessorClient);
 
 //class AudioProcessorClient extends AudioWorkletProcessor { // пробую вместо верхнего
 //    process(inputs) {
@@ -26,20 +45,3 @@ registerProcessor('audioProcessorClient', AudioProcessorClient);
 //registerProcessor('audioProcessorClient', AudioProcessorClient);
 
 
-
-//class AudioProcessorClient extends AudioWorkletProcessor { // вот это со звуком в наушники
-//    process(inputs, outputs) {
-//        const input = inputs[0];
-//        const output = outputs[0];
-//        if (input && input.length > 0 && output && output.length > 0) {
-//            // Копируем данные из входа в выход для каждого канала
-//            for (let channel = 0; channel < input.length; ++channel) {
-//                output[channel].set(input[channel]);
-//            }
-//            // Дополнительно отправляем данные в порт, если нужно видеть байты
-//            this.port.postMessage(input[0].slice());
-//        }
-//        return true;
-//    }
-//}
-//registerProcessor('audioProcessorClient', AudioProcessorClient);

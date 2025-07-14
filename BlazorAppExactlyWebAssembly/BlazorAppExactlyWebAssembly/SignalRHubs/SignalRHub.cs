@@ -58,7 +58,7 @@ public class SignalRHub : Hub, ISignalRHub
     public async Task ReceiveAudioChunk(byte[] chunk) // короче хз, ничего не идет
     {
         Console.WriteLine($"чанк длиной {chunk.Length}");
-        foreach (var b in chunk)
+        await foreach (var b in chunk)
         {
             Console.Write($"{b} ");
         }    

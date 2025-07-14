@@ -68,7 +68,3 @@ namespace BlazorAppExactlyWebAssembly
         }
     }
 }
-
-/*Ћогика котора€ мне нужна: открываю соединение через SignalRHubForBlazor по пути /hubs/blazor при открытии страницы. Ёто соединение должно жить пока открыта страница. ѕотом когда € нажимаю на кнопку 
-<button class= "btn btn-primary" @onclick = "SoundStreaming" >@(isActive ? "Stop translate" : "Start translate") </ button >
-ƒолжно открытьс€ другое соединение: app.MapHub<SignalRHub>("/hubs/audiohub");  оторое должно будет передавать звук с микрофона*/
