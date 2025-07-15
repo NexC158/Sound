@@ -9,9 +9,11 @@ public interface ISignalRHub
     //Task StartStreamingCommand();
     //Task StopStreamingCommand();
    // string GetMyConnectionId();
-    Task CreateAndSendAudioChunk();
+    //Task CreateAndSendAudioChunk();
 
     Task ReceiveAudioStream(ChannelReader<byte> stream);
+
+    Task ReceiveAudioChunk(byte[] chunk);
 
     Task<string> GetHelloWorld();
 }

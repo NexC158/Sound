@@ -18,13 +18,13 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
     {
         this._logger = logger;
 
-        var options = new BoundedChannelOptions(1)
-        {
-            SingleReader = true,
-            SingleWriter = false, // ?
-            FullMode = BoundedChannelFullMode.Wait
-        };
-        _channel = Channel.CreateBounded<byte>(options);
+        //var options = new BoundedChannelOptions(1)
+        //{
+        //    SingleReader = true,
+        //    SingleWriter = false, // ?
+        //    FullMode = BoundedChannelFullMode.Wait
+        //};
+        //_channel = Channel.CreateBounded<byte>(options);
     }
 
     public async Task OnStreamStarted()
@@ -58,17 +58,30 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
         return base.OnDisconnectedAsync(exception);
     }
 
+    public async Task ReceiveAudioChunk(byte[] chunk)
+    {
+        Console.WriteLine($"Chunk length: {chunk.Length}");
+        Console.WriteLine(string.Join(", ", chunk.Take(16))); // Выводит первые 16 элементов
+
+        await Clients.Others.OnAudioChunk(chunk); // ретрансляция
+    }
+
     public async Task ReceiveAudioStream(ChannelReader<byte> stream)
     {
         // this.Context.ConnectionId
         Console.WriteLine("STR: start stream");
-        
+
         try
         {
             Console.WriteLine("stream content: ");
-            await foreach (var b in stream.ReadAllAsync())
+            Console.WriteLine($"stream content: {stream}");
+            await foreach (var chunk in stream.ReadAllAsync())
             {
-                _channel.Writer.TryWrite(b);
+                
+                    Console.Write($"{chunk}");
+                    _channel.Writer.TryWrite(chunk);
+                
+                
             }
 
             Console.WriteLine("STR: stop stream");

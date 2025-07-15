@@ -7,8 +7,6 @@ namespace BlazorAppExactlyWebAssembly.Client;
 
 public class Program
 {
-    public static string _dbg = "empty";
-
     public static async Task Main(string[] args)
     {
         Console.WriteLine("in client main");
