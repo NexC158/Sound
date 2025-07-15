@@ -57,11 +57,24 @@ async function startTranslate() {
         audioContext = null;
     }
 
-    //subject = new signalR.Subject();
+    const subject = new signalR.Subject();
+                        //send stream invoke
+    connectionForAudioHub.stream("GetBytesFromAudioStream", subject); //  GetBytesFromAudioStream
 
-    //connectionForAudioHub.send("ReceiveAudioChunk", subject); //  GetBytesFromAudioStream
+    //yield connectionForAudioHub.send("GetBytesFromAudioStream", subject);
+    //var iteration = 0;
+    //const intervalHandle = setInterval(() => {
+    //    iteration++;
+    //    subject.next(iteration.toString());
+    //    if (iteration === 10) {
+    //        clearInterval(intervalHandle);
+    //        subject.complete();
+    //    }
+    //}, 500);
 
-    audioContext = new window.AudioContext({ sampleRate: 16000 });
+
+
+    audioContext = new window.AudioContext({ sampleRate: 8000 });
 
     await audioContext.audioWorklet.addModule('js/audioProcessorClient.js');
     audioWorkletNode = new AudioWorkletNode(audioContext, 'audioProcessorClient');
@@ -73,43 +86,52 @@ async function startTranslate() {
 
 
 
-    //audioWorkletNode.port.onmessage = (event) => { // обработчик на получение сообщений из аудиопроцессора audioProcessor
-    //    try {
-    //        const float32Array = event.data; // тут можно кодировать в opus помощью libopus.js
-    //        // const opusFrame = opusEncoder.encode(pcm);
-    //        const int16Array = new Int16Array(float32Array.length); // вот тут нужно пошаманить
+    portHandler = event => { // обработчик на получение сообщений из аудиопроцессора audioProcessor
+        try {
 
-    //        for (let i = 0; i < float32Array.length; i++) {
+            if (!isTransmitting) {
 
-    //            int16Array[i] = Math.min(1, Math.max(-1, float32Array[i])) * 0x7FFF; // преобразование каждого сэмпла в диапазон [-32767, 32767]
-    //        }
-    //        subject.next(new Uint8Array(int16Array.buffer)); // отправка в hub командой subject.next
-    //    }
-    //    catch (err) {
-    //        console.err("Ошибка получения данных из аудиопроцессора:", err);
-    //    }
-    //};
+                return;
+            }
+            const float32Array = event.data;
+            const int16Array = new Int16Array(float32Array.length); // вот тут нужно пошаманить
+
+            for (let i = 0; i < float32Array.length; i++) {
+
+                int16Array[i] = Math.min(1, Math.max(-1, float32Array[i])) * 0x7FFF; // преобразование каждого сэмпла в диапазон [-32767, 32767]
+            }
+            
+            
+            const whatIsToSend = new Uint8Array(int16Array.buffer);
+            console.log('чанк в audioWorkletNode.port.onmessage:::', whatIsToSend);
+
+            subject.next(whatIsToSend); // отправка в hub командой subject.next
+        }
+        catch (err) {
+            console.error("Ошибка получения данных из аудиопроцессора:", err);
+        }
+    };
 
     ///audioWorkletNode.port.onmessage = e => subject.next(e.data); // пробую вместо верхнего
 
-    const CHUNK_SIZE = 512; // 1024 2048 4096
+    //const CHUNK_SIZE = 512; // 1024 2048 4096
 
-    portHandler = e => { // вот это кое-как работает
+    //portHandler = e => { // вот это кое-как работает
 
-        if (!isTransmitting) {
+    //    if (!isTransmitting) {
 
-            return;
-        }
+    //        return;
+    //    }
 
-        const data = new Uint8Array(1024);
+    //    const data = new Uint8Array(1024);
         
-        for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+    //    for (let i = 0; i < data.length; i += CHUNK_SIZE) {
 
-            const chunk = data.slice(i, i + CHUNK_SIZE);
-            console.log('чанк в audioWorkletNode.port.onmessage:::', chunk);
-            connectionForAudioHub.on("ReceiveAudioChunk", chunk);
-        }
-    };
+    //        const chunk = data.slice(i, i + CHUNK_SIZE);
+    //        console.log('чанк в audioWorkletNode.port.onmessage:::', chunk);
+    //        connectionForAudioHub.on("ReceiveAudioChunk", chunk);
+    //    }
+    //};
 
     audioWorkletNode.port.onmessage = portHandler;
     isTransmitting = true;

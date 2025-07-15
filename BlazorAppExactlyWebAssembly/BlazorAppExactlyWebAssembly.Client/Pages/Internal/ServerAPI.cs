@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNet.SignalR.Client.Hubs;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using System.Data.Common;
@@ -9,10 +10,10 @@ public class ServerAPI : IAsyncDisposable
 {
     private HubConnection _connection;
 
-    private readonly NavigationManager _navigationManager;
-    public ServerAPI(NavigationManager navigationManager)
+    //private readonly NavigationManager _navigationManager;
+    public ServerAPI() //NavigationManager navigationManager
     {
-        _navigationManager = navigationManager ?? throw new ArgumentNullException(nameof(navigationManager));
+        //_navigationManager = navigationManager ?? throw new ArgumentNullException(nameof(navigationManager));
 
         _connection = new HubConnectionBuilder()
           .WithUrl("https://localhost:7069/hubs/blazor")
@@ -26,69 +27,14 @@ public class ServerAPI : IAsyncDisposable
 
     public async Task<HubConnection> InitializeAsync()
     {
-        if (_connection.State == HubConnectionState.Disconnected)
+        var connection = _connection;
+        if (connection.State == HubConnectionState.Disconnected)
         {
-            await _connection.StartAsync();
+            await connection.StartAsync();
         }
 
-        return _connection;
+        return connection;
     }
-
-    //public async Task<(bool isFailed, string failedReaaon)> Init()
-    //{
-    //    try
-    //    {
-    //        _connection = await InitializeAsync();
-    //        return (false, "");
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return (true, ex.ToString());
-    //    }
-    //}
-
-    //public static async Task<HubConnection> BuildAndStartConnection()
-    //{
-    //    try
-    //    {
-    //        var connection = new HubConnectionBuilder()
-    //       //.WithUrl(new Uri("hubs/blazor"))
-    //       .WithUrl("https://localhost:7069/hubs/blazor")
-    //       .Build();
-
-    //        await connection.StartAsync();
-    //        return connection;
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Console.WriteLine($"BuildAndStartConnection: {ex.Message}");
-    //        throw;
-    //    }
-    //}
-
-    //public static string BuildAndStartConnection_test()
-    //{
-    //    try
-    //    {
-    //        var connection = new HubConnectionBuilder()
-    //           .WithUrl("https://localhost:7069/hubs/blazor")
-    //           .Build();
-
-    //        connection.StartAsync().Wait();
-
-    //        if (connection.State == HubConnectionState.Connected)
-    //        {
-    //            return "ok";
-    //        }
-    //        else return "notOk";
-            
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Console.WriteLine($"OnInitializedAsync: {ex.Message}");
-    //        return ex.ToString();
-    //    }
-    //}
 
     public async Task StartStreamingCommand()
     {
@@ -115,5 +61,61 @@ public class ServerAPI : IAsyncDisposable
         }
     }
 }
+
+//public async Task<(bool isFailed, string failedReaaon)> Init()
+//{
+//    try
+//    {
+//        _connection = await InitializeAsync();
+//        return (false, "");
+//    }
+//    catch (Exception ex)
+//    {
+//        return (true, ex.ToString());
+//    }
+//}
+
+//public static async Task<HubConnection> BuildAndStartConnection()
+//{
+//    try
+//    {
+//        var connection = new HubConnectionBuilder()
+//       //.WithUrl(new Uri("hubs/blazor"))
+//       .WithUrl("https://localhost:7069/hubs/blazor")
+//       .Build();
+
+//        await connection.StartAsync();
+//        return connection;
+//    }
+//    catch (Exception ex)
+//    {
+//        Console.WriteLine($"BuildAndStartConnection: {ex.Message}");
+//        throw;
+//    }
+//}
+
+//public static string BuildAndStartConnection_test()
+//{
+//    try
+//    {
+//        var connection = new HubConnectionBuilder()
+//           .WithUrl("https://localhost:7069/hubs/blazor")
+//           .Build();
+
+//        connection.StartAsync().Wait();
+
+//        if (connection.State == HubConnectionState.Connected)
+//        {
+//            return "ok";
+//        }
+//        else return "notOk";
+
+//    }
+//    catch (Exception ex)
+//    {
+//        Console.WriteLine($"OnInitializedAsync: {ex.Message}");
+//        return ex.ToString();
+//    }
+//}
 
 

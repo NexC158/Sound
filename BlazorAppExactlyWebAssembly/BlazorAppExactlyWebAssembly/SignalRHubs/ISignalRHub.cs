@@ -1,7 +1,7 @@
 ﻿using System.Threading.Channels;
 using TypedSignalR.Client;
 
-namespace BlazorAppExactlyWebAssembly.SignalRHubs;
+namespace BlazorAppExactlyWebAssembly.SignalRHubShared2;
 
 [Hub]
 public interface ISignalRHub
@@ -9,9 +9,9 @@ public interface ISignalRHub
     //Task StartStreamingCommand();
     //Task StopStreamingCommand();
    // string GetMyConnectionId();
-    Task GetBytesFromAudioStream(ChannelReader<byte> stream);
-
     Task CreateAndSendAudioChunk();
+
+    Task ReceiveAudioStream(ChannelReader<byte> stream);
 
     Task<string> GetHelloWorld();
 }

@@ -1,7 +1,7 @@
 using BlazorAppExactlyWebAssembly.Client.Pages;
 using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 using BlazorAppExactlyWebAssembly.Components;
-using BlazorAppExactlyWebAssembly.SignalRHubs;
+using BlazorAppExactlyWebAssembly.SignalRHubShared2;
 
 
 namespace BlazorAppExactlyWebAssembly
@@ -20,7 +20,8 @@ namespace BlazorAppExactlyWebAssembly
             builder.Services.AddSignalR();
 
             builder.Services.AddTransient<ServerAPI>(); // some experiments AddTransient or AddScoped of AddSingleton
-            builder.Services.AddTransient<HubService>();
+            builder.Services.AddSingleton<HubService>();
+            builder.Services.AddSingleton<IAudioStreamReceiver>(sp => (IAudioStreamReceiver)sp.GetRequiredService<HubService>());
 
             builder.Services.AddCors(options =>
             {

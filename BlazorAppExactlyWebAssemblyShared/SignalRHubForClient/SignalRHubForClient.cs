@@ -1,38 +1,44 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿
+#if false
+
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
+using System;
 
-namespace BlazorAppExactlyWebAssemblyShared.SignalRHubForClient;
-
-public class SignalRHubForClient : Hub
+namespace BlazorAppExactlyWebAssembly.SignalRHubs
 {
-    private readonly HubConnection _connection;
+    public class SignalRHubForBlazor : Hub
+    {
+        private readonly HubConnection _connection;
 
-    public SignalRHubForClient(NavigationManager navigationManager)
-    {
-        _connection = new HubConnectionBuilder()
-           .WithUrl(navigationManager.ToAbsoluteUri("/audiohub"))
-           .Build();
-    }
+        public SignalRHubForBlazor()
+        {
+           // _connection = new HubConnectionBuilder()
+           //.WithUrl(new Uri("https://127.0.0.1:10000/"))
+           //.Build();
+        }
 
-    public async Task StartStreamingCommand()
-    {
-        await Clients.All.SendAsync("startTranslateAudio");
-    }        
-    public async Task StopStreamingCommand()
-    {
-        await Clients.All.SendAsync("stopTranslateAudio");
-    }
+        //public async Task StartStreamingCommand()
+        //{
+        //    await Clients.All.SendAsync("startTranslateAudio");
+        //}
+        //public async Task StopStreamingCommand()
+        //{
+        //    await Clients.All.SendAsync("stopTranslateAudio");
+        //}
 
-    public async Task StartConnectionAsync()
-    {
-        if (_connection.State == HubConnectionState.Disconnected)
-            await _connection.StartAsync();
-    }
+        //public async Task StartConnectionAsync()
+        //{
+        //    if (_connection.State == HubConnectionState.Disconnected)
+        //        await _connection.StartAsync();
+        //}
 
-    public async Task StopConnectionAsync()
-    {
-        if (_connection.State == HubConnectionState.Connected)
-            await _connection.StopAsync();
+        //public async Task StopConnectionAsync()
+        //{
+        //    if (_connection.State == HubConnectionState.Connected)
+        //        await _connection.StopAsync();
+        //}
     }
 }
+
+#endif

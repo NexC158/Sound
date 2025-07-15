@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Net;
 
-namespace BlazorAppExactlyWebAssembly.SignalRHubs;
+namespace BlazorAppExactlyWebAssembly.SignalRHubShared2;
 
 public class SignalRHubForBlazor : Hub
 {
@@ -17,15 +17,12 @@ public class SignalRHubForBlazor : Hub
     public async Task HubStartStreamingCommand()
     {
         Console.WriteLine("SignalRHubForBlazor HubStartStreamingCommand ");
-
-        await _hubService.TransferStartInvoke("SignalRHubStartStreamingCommand");
-        //await Clients.All.SendAsync("startTranslateAudio");
+        await _hubService.TransferInvokeMethod("SignalRHubStartStreamingCommand");
     }        
     public async Task HubStopStreamingCommand()
     {
         Console.WriteLine("SignalRHubForBlazor HubStopStreamingCommand ");
-        await _hubService.TransferStartInvoke("SignalRHubStopStreamingCommand");
-        //await Clients.All.SendAsync("stopTranslateAudio");
+        await _hubService.TransferInvokeMethod("SignalRHubStopStreamingCommand");
     }
 
     public override Task OnConnectedAsync()
@@ -48,11 +45,4 @@ public class SignalRHubForBlazor : Hub
         }
         return base.OnDisconnectedAsync(exception);
     }
-
-    //public async Task<string> GetHelloWorld()
-    //{
-    //    Console.WriteLine($"Hello world: {this.Context.ConnectionId}");
-    //    Console.WriteLine($"features: [{string.Join(", ", this.Context.Features)}]");
-    //    return "hello word";
-    //}
 }

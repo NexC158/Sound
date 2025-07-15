@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@wasm-audio-decoders/common": "^9.0.7",
+    "opus-recorder": "^8.0.5"
+  }
+}

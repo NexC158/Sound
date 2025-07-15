@@ -10,6 +10,42 @@
                 "dist/browser/signalr.min.js",
                 "dist/browser/signalr.min.js.map"
             ]
+        },
+        {
+            "provider": "jsdelivr",
+            "library": "opus-media-recorder@latest",
+            "destination": "wwwroot/lib/opus-media-recorder/",
+            "files": [
+                "CHANGELOG.md",
+                "commonFunctions.js",
+                "commonFunctions.min.js",
+                "encoderWorker.js",
+                "encoderWorker.min.js",
+                "encoderWorker.umd.js",
+                "encoderWorker.umd.min.js",
+                "LICENSE.md",
+                "OggOpusEncoder.bin",
+                "OggOpusEncoder.js",
+                "OggOpusEncoder.min.js",
+                "OggOpusEncoder.wasm",
+                "OpusMediaRecorder.js",
+                "OpusMediaRecorder.min.js",
+                "OpusMediaRecorder.umd.js",
+                "OpusMediaRecorder.umd.min.js",
+                "package.json",
+                "README.md",
+                "WaveEncoder.js",
+                "WaveEncoder.min.js",
+                "WebMOpusEncoder.bin",
+                "WebMOpusEncoder.js",
+                "WebMOpusEncoder.min.js",
+                "WebMOpusEncoder.wasm"
+            ]
+        },
+        {
+            "provider": "jsdelivr",
+            "library": "opus-decoder@latest",
+            "destination": "wwwroot/lib/opus-decoder/"
         }
     ]
 }

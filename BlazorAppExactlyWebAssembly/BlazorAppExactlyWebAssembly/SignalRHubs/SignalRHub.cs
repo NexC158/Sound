@@ -4,9 +4,9 @@ using System.Threading.Channels;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks.Dataflow;
 
-namespace BlazorAppExactlyWebAssembly.SignalRHubs;
+namespace BlazorAppExactlyWebAssembly.SignalRHubShared2;
 
-public class SignalRHub : Hub, ISignalRHub
+public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
 {
     private readonly ILogger<SignalRHub> _logger;
     private Channel<byte> _channel;
@@ -26,15 +26,7 @@ public class SignalRHub : Hub, ISignalRHub
         };
         _channel = Channel.CreateBounded<byte>(options);
     }
-    //public async Task SignalRHubStartStreamingCommand()
-    //{
-    //    await Clients.All.SendAsync("startTranslateAudio");
-    //}
 
-    //public async Task SignalRHubStopStreamingCommand()
-    //{
-    //    await Clients.All.SendAsync("stopTranslateAudio");
-    //}
 
     public string GetMyConnectionId()
     {
@@ -45,6 +37,9 @@ public class SignalRHub : Hub, ISignalRHub
     {
         _logger.LogTrace("Logger: connection opened: {this.Context.ConnectionId}", this.Context.ConnectionId);
         Console.WriteLine($"SignalRHub connection (OnConnectedAsync) opened: {this.Context.ConnectionId}");
+
+        // await Clients.Others.OnStreamStarted(); // уведомление другим клиентам что кто-то подключился (может вообще не нужно)
+
         return base.OnConnectedAsync();
     }
 
@@ -52,35 +47,23 @@ public class SignalRHub : Hub, ISignalRHub
     {
         _logger.LogTrace("Logger: connection closed: {this.Context.ConnectionId}", this.Context.ConnectionId);
         Console.WriteLine($"SignalRHub connection (OnDisconnectedAsync) closed: {this.Context.ConnectionId}");
+
+        // await Clients.Others.OnStreamStopped(); // уведомление другим клиентам что кто-то отключился (может вообще не нужно)
+
         return base.OnDisconnectedAsync(exception);
     }
 
-    public async Task ReceiveAudioChunk(byte[] chunk) // короче хз, ничего не идет
-    {
-        Console.WriteLine($"чанк длиной {chunk.Length}");
-        await foreach (var b in chunk)
-        {
-            Console.Write($"{b} ");
-        }    
-        Console.WriteLine();
-    }
-
-    public async Task GetBytesFromAudioStream(ChannelReader<byte> stream)
+    public async Task ReceiveAudioStream(ChannelReader<byte> stream)
     {
         // this.Context.ConnectionId
         Console.WriteLine("STR: start stream");
-        var writer = _channel.Writer;
-        //await CreateAndSendAudioChunk();
+        
         try
         {
             Console.WriteLine("stream content: ");
             await foreach (var b in stream.ReadAllAsync())
             {
-                writer.TryWrite(b);
-                // foreach (var b in chunk)
-                {
-                    Console.Write(b);
-                }
+                _channel.Writer.TryWrite(b);
             }
 
             Console.WriteLine("STR: stop stream");
@@ -94,33 +77,19 @@ public class SignalRHub : Hub, ISignalRHub
 
     public async Task CreateAndSendAudioChunk()
     {
-        var reader = _channel.Reader;
-
-        byte[] packet = new byte[_packetSize];
-        try
+        while (await _channel.Reader.WaitToReadAsync())
         {
-            while (await reader.WaitToReadAsync())
+            while (_channel.Reader.TryRead(out var b))
             {
-                while (reader.TryRead(out var b))
+                _audioBuffer.Add(b);
+                if (_audioBuffer.Count >= _packetSize)
                 {
-                    _audioBuffer.Add(b);
-                    if (_audioBuffer.Count == _packetSize)
-                    {
-                        packet = _audioBuffer.Take(_packetSize).ToArray();
-                        _logger.LogTrace("Logger: AudioChunk: {this.Context.ConnectionId}, Размер пакета: {packet.Length} байт", this.Context.ConnectionId, packet.Length);
-                        _audioBuffer.RemoveRange(0, _packetSize);
-
-                        var preview = string.Join(", ", packet.Take(10));
-                        await Clients.Others.SendAsync("ReceiveAudioChunk", packet);
-                    }
+                    var packet = _audioBuffer.Take(_packetSize).ToArray();
+                    _audioBuffer.RemoveRange(0, _packetSize);
+                    await Clients.Others.OnAudioChunk(packet);
                 }
             }
         }
-        catch(Exception ex)
-        {
-            Console.WriteLine(ex);
-        }
-        
     }
 
     public async Task<string> GetHelloWorld()
