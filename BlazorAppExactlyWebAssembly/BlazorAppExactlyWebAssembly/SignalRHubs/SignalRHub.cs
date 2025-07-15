@@ -4,7 +4,7 @@ using System.Threading.Channels;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks.Dataflow;
 
-namespace BlazorAppExactlyWebAssembly.SignalRHubShared2;
+namespace BlazorAppExactlyWebAssembly.SignalRHubShared;
 
 public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
 {
@@ -25,6 +25,11 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
             FullMode = BoundedChannelFullMode.Wait
         };
         _channel = Channel.CreateBounded<byte>(options);
+    }
+
+    public async Task OnStreamStarted()
+    {
+        await Clients.All.OnStreamStarted();
     }
 
 

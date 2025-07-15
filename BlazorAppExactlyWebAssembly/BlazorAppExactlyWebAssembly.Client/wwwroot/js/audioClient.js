@@ -12,14 +12,14 @@ const connectionForAudioHub = new signalR.HubConnectionBuilder()
     .withUrl("https://localhost:7069/hubs/audiohub")
     .build();
 
-connectionForAudioHub.on("SignalRHubStartStreamingCommand", async () => {
+connectionForAudioHub.on("OnCustomCommandStart", async () => {
 
     //alert('была нажата кнопка на начало трансляции звука: должен сработать startTranslate()');
     await startTranslate();
     
 });
 
-connectionForAudioHub.on("SignalRHubStopStreamingCommand", () => {
+connectionForAudioHub.on("OnCustomCommandStop", () => {
 
     //alert('сработал connection.on("stopTranslateAudio"');
     stopTranslate();

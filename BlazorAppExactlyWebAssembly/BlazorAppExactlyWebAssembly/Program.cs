@@ -1,7 +1,7 @@
 using BlazorAppExactlyWebAssembly.Client.Pages;
 using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 using BlazorAppExactlyWebAssembly.Components;
-using BlazorAppExactlyWebAssembly.SignalRHubShared2;
+using BlazorAppExactlyWebAssembly.SignalRHubShared;
 
 
 namespace BlazorAppExactlyWebAssembly

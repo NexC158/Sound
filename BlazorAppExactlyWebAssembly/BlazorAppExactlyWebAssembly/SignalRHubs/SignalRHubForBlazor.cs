@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Net;
 
-namespace BlazorAppExactlyWebAssembly.SignalRHubShared2;
+namespace BlazorAppExactlyWebAssembly.SignalRHubShared;
 
 public class SignalRHubForBlazor : Hub
 {
@@ -17,12 +17,12 @@ public class SignalRHubForBlazor : Hub
     public async Task HubStartStreamingCommand()
     {
         Console.WriteLine("SignalRHubForBlazor HubStartStreamingCommand ");
-        await _hubService.TransferInvokeMethod("SignalRHubStartStreamingCommand");
+        await _hubService.TransferInvokeStart(); // "SignalRHubStartStreamingCommand"
     }        
     public async Task HubStopStreamingCommand()
     {
         Console.WriteLine("SignalRHubForBlazor HubStopStreamingCommand ");
-        await _hubService.TransferInvokeMethod("SignalRHubStopStreamingCommand");
+        await _hubService.TransferInvokeStop(); // "SignalRHubStopStreamingCommand"
     }
 
     public override Task OnConnectedAsync()

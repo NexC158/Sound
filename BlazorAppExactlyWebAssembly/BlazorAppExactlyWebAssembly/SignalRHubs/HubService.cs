@@ -1,24 +1,30 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace BlazorAppExactlyWebAssembly.SignalRHubShared2;
+namespace BlazorAppExactlyWebAssembly.SignalRHubShared;
 
-public class HubService : IAudioStreamReceiver// это мой паблишер
+public class HubService : Hub, IAudioStreamReceiver// это мой паблишер
 {
-    private readonly IHubContext<SignalRHub> _audioHubContext;                  // был private readonly IHubContext<SignalRHubForBlazor> _blazorHubContext;
+    private readonly IHubContext<SignalRHubForBlazor> _blazorHubContext;// был private readonly IHubContext<SignalRHubForBlazor> _blazorHubContext;
                                                                                 // проблема в этом
     private readonly IHubContext<SignalRHub, IAudioStreamReceiver> _hubContext; //
 
-    public HubService(IHubContext<SignalRHub> audioHubContext, IHubContext<SignalRHub, IAudioStreamReceiver> hubContext)
+    public HubService(IHubContext<SignalRHubForBlazor> blazorHubContext, IHubContext<SignalRHub, IAudioStreamReceiver> hubContext)
     {
-        _audioHubContext = audioHubContext;
+        _blazorHubContext = blazorHubContext;
         _hubContext = hubContext;
 
     }
 
-    public async Task TransferInvokeMethod(string method)
+    public async Task TransferInvokeStart() // string method
     {
-        await _audioHubContext.Clients.All.SendAsync(method); // старый метод без IAudioStreamReceiver в конструкторе
+        await _hubContext.Clients.All.OnCustomCommandStart();
     }
+
+    public async Task TransferInvokeStop() // string method
+    {
+        await _hubContext.Clients.All.OnCustomCommandStop();
+    }
+
 
     public async Task OnStopSendAudioChunk()
     {
@@ -27,22 +33,22 @@ public class HubService : IAudioStreamReceiver// это мой паблишер
 
     public async Task OnStreamStarted()
     {
-        await _audioHubContext.Clients.All.SendAsync("OnStreamStarted");
+        await _blazorHubContext.Clients.All.SendAsync("OnStreamStarted");
     }
 
     public async Task OnStreamStopped()
     {
-        await _audioHubContext.Clients.All.SendAsync("OnStreamStopped");
+        await _blazorHubContext.Clients.All.SendAsync("OnStreamStopped");
     }
 
     public async Task OnRemoveStream()
     {
-        await _audioHubContext.Clients.All.SendAsync("OnRemoveStream");
+        await _blazorHubContext.Clients.All.SendAsync("OnRemoveStream");
     }
 
     public async Task OnAudioChunk(byte[] chunk)
     {
-        await _audioHubContext.Clients.All.SendAsync("OnAudioChunk", chunk);
+        await _blazorHubContext.Clients.All.SendAsync("OnAudioChunk", chunk);
     }
 
     // не знаю нужны ли будут эти методы
@@ -54,10 +60,21 @@ public class HubService : IAudioStreamReceiver// это мой паблишер
     {
         await _hubContext.Clients.All.OnStreamStopped();
     }
+    //
 
     public async Task SendAudioChunkToAll(byte[] chunk)
     {
         await _hubContext.Clients.All.OnAudioChunk(chunk);
+    }
+
+    public Task OnCustomCommandStart()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task OnCustomCommandStop()
+    {
+        throw new NotImplementedException();
     }
 }
 
