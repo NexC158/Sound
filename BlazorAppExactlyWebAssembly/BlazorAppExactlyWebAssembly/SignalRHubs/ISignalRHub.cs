@@ -13,8 +13,6 @@ public interface ISignalRHub
 
     Task ReceiveAudioStream(ChannelReader<byte> stream);
 
-    Task ReceiveAudioChunk(byte[] chunk);
-
-    Task<string> GetHelloWorld();
+    Task ReceiveAudioChunk(ChannelReader<byte[]> chunkStream);
 }
 

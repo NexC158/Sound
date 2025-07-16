@@ -7,28 +7,22 @@ let isTransmitting = false; // Флаг активности передачи
 let portHandler = null; 
 let subject = null;
 
-
-
-alert('запустился audioClient.js');
-
 const connectionForAudioHub = new signalR.HubConnectionBuilder()
     .withUrl("https://localhost:7069/hubs/audiohub")
     .build();
 
 connectionForAudioHub.on("OnCustomCommandStart", async () => {
 
-    //alert('была нажата кнопка на начало трансляции звука: должен сработать startTranslate()');
     await startTranslate();
     
 });
 
 connectionForAudioHub.on("OnCustomCommandStop", () => {
 
-    //alert('сработал connection.on("stopTranslateAudio"');
     stopTranslate();
 });
 
-connectionForAudioHub.start(); // вызываю после обработчиков чтобы они не получили никаких сообщений до регистрации
+connectionForAudioHub.start();
 
 async function requestMicrophoneAccess() {
 
@@ -60,24 +54,10 @@ async function startTranslate() {
         audioContext = null;
     }
 
-     subject = new signalR.Subject();
+    subject = new signalR.Subject();
 
-
-                        //send stream invoke
-    //connectionForAudioHub.invoke("ReceiveAudioChunk", subject); //  GetBytesFromAudioStream
-
-    //yield connectionForAudioHub.send("GetBytesFromAudioStream", subject);
-    //var iteration = 0;
-    //const intervalHandle = setInterval(() => {
-    //    iteration++;
-    //    subject.next(iteration.toString());
-    //    if (iteration === 10) {
-    //        clearInterval(intervalHandle);
-    //        subject.complete();
-    //    }
-    //}, 500);
-
-    await connectionForAudioHub.send("ReceiveAudioChunk", subject); // ReceiveAudioStream ReceiveAudioChunk
+    //send - для отправки на сервер\\ //stream - для отправки с сервера\\ //invoke - не знаю зачем\\
+    await connectionForAudioHub.send("ReceiveAudioStream", subject); // ReceiveAudioStream ReceiveAudioChunk
 
     audioContext = new window.AudioContext({ sampleRate: 8000 });
 
@@ -89,8 +69,6 @@ async function startTranslate() {
 
     audioWorkletNode.connect(audioContext.destination);// если без destination, то обработка будет идти не в средство вывода а на сервер
 
-
-
     portHandler = async (event) => { // обработчик на получение сообщений из аудиопроцессора audioProcessor
         try {
 
@@ -100,16 +78,21 @@ async function startTranslate() {
             }
             const float32Array = event.data;
             const int16Array = new Int16Array(float32Array.length); // вот тут нужно пошаманить
-
             for (let i = 0; i < float32Array.length; i++) {
 
                 int16Array[i] = Math.min(1, Math.max(-1, float32Array[i])) * 0x7FFF; // преобразование каждого сэмпла в диапазон [-32767, 32767]
+
             }
 
             const whatIsToSend = new Uint8Array(int16Array.buffer);
             console.log('чанк в audioWorkletNode.port.onmessage:::', whatIsToSend);
+
+            //subject.next(whatIsToSend);
             
-            subject.next(whatIsToSend); // отправка в hub командой subject.next
+            for (let i = 0; i < whatIsToSend.length; i++) {
+
+                subject.next(whatIsToSend[i]);
+            }
             
         }
         catch (err) {
@@ -120,37 +103,11 @@ async function startTranslate() {
 
     audioWorkletNode.port.onmessage = portHandler;
     isTransmitting = true;
-
-    ///audioWorkletNode.port.onmessage = e => subject.next(e.data); // пробую вместо верхнего
-
-    //const CHUNK_SIZE = 512; // 1024 2048 4096
-
-    //portHandler = e => { // вот это кое-как работает
-
-    //    if (!isTransmitting) {
-
-    //        return;
-    //    }
-
-    //    const data = new Uint8Array(1024);
-        
-    //    for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-
-    //        const chunk = data.slice(i, i + CHUNK_SIZE);
-    //        console.log('чанк в audioWorkletNode.port.onmessage:::', chunk);
-    //        connectionForAudioHub.on("ReceiveAudioChunk", chunk);
-    //    }
-    //};
-
-    
-
-    //audioWorkletNode.port.onmessage = e => {
-    //    connectionForAudioHub.send("ReceiveAudioChunk", e.data);
-    //};
 }
 
 function stopTranslate() {
 
+    console.log('Команда остановки передачи')
     if (!isTransmitting) {
 
         console.log('Передача уже остановлена');
@@ -183,3 +140,50 @@ function stopTranslate() {
 }
 
 
+
+
+
+
+//send stream invoke
+//connectionForAudioHub.invoke("ReceiveAudioChunk", subject); //  GetBytesFromAudioStream
+
+//yield connectionForAudioHub.send("GetBytesFromAudioStream", subject);
+//var iteration = 0;
+//const intervalHandle = setInterval(() => {
+//    iteration++;
+//    subject.next(iteration.toString());
+//    if (iteration === 10) {
+//        clearInterval(intervalHandle);
+//        subject.complete();
+//    }
+//}, 500);
+
+
+
+
+///audioWorkletNode.port.onmessage = e => subject.next(e.data); // пробую вместо верхнего
+
+//const CHUNK_SIZE = 512; // 1024 2048 4096
+
+//portHandler = e => { // вот это кое-как работает
+
+//    if (!isTransmitting) {
+
+//        return;
+//    }
+
+//    const data = new Uint8Array(1024);
+
+//    for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+
+//        const chunk = data.slice(i, i + CHUNK_SIZE);
+//        console.log('чанк в audioWorkletNode.port.onmessage:::', chunk);
+//        connectionForAudioHub.on("ReceiveAudioChunk", chunk);
+//    }
+//};
+
+
+
+//audioWorkletNode.port.onmessage = e => {
+//    connectionForAudioHub.send("ReceiveAudioChunk", e.data);
+//};
