@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="C:\Users\PC\Desktop\BlazorAppExactlyWebAssemblyShared\BlazorAppExactlyWebAssemblyShared.csproj" />
+    <ProjectReference Include="C:\Users\Дыня\source\repos\Sound\BlazorAppExactlyWebAssemblyShared\BlazorAppExactlyWebAssemblyShared.csproj" />
   </ItemGroup>
 
 </Project>
