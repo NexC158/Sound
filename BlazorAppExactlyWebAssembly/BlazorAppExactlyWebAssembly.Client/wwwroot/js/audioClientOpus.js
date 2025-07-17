@@ -58,6 +58,7 @@ async function startTranslate() {
 function stopTranslate() {
     if (!isTransmitting) return;
     isTransmitting = false;
+    
     if (recorder) {
         recorder.stop();
         recorder = null;

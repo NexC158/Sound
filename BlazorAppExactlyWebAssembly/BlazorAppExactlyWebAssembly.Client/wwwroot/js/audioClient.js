@@ -85,15 +85,14 @@ async function startTranslate() {
             }
 
             const whatIsToSend = new Uint8Array(int16Array.buffer);
-            console.log('чанк в audioWorkletNode.port.onmessage:::', whatIsToSend);
 
-            //subject.next(whatIsToSend);
-            
-            for (let i = 0; i < whatIsToSend.length; i++) {
-
+            for (i = 0; i < whatIsToSend.length; i++)
+            {
                 subject.next(whatIsToSend[i]);
             }
-            
+            console.log('чанк в audioWorkletNode.port.onmessage:::', whatIsToSend);
+
+            subject.next(whatIsToSend); // отправка в hub командой subject.next
         }
         catch (err) {
             console.error("Ошибка получения данных из аудиопроцессора:", err);
