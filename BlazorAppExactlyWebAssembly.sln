@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppExactlyWebAssembly
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppExactlyWebAssembly.Client", "BlazorAppExactlyWebAssembly\BlazorAppExactlyWebAssembly.Client\BlazorAppExactlyWebAssembly.Client.csproj", "{2FEC8593-A345-42C1-A884-4438CD5BFC26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppExactlyWebAssemblyShared", "C:\Users\PC\Desktop\BlazorAppExactlyWebAssemblyShared1\BlazorAppExactlyWebAssemblyShared.csproj", "{3C97E4B2-1B84-46C5-84E1-16DE9921BAB5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppExactlyWebAssemblyShared", "BlazorAppExactlyWebAssemblyShared\BlazorAppExactlyWebAssemblyShared.csproj", "{3C97E4B2-1B84-46C5-84E1-16DE9921BAB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
