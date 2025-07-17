@@ -65,7 +65,7 @@ async function startTranslate() {
     //var iteration = 0;
     //const intervalHandle = setInterval(() => {
     //    iteration++;
-    //    subject.next(iteration.toString());
+    //    subject.next(45);
     //    if (iteration === 10) {
     //        clearInterval(intervalHandle);
     //        subject.complete();
