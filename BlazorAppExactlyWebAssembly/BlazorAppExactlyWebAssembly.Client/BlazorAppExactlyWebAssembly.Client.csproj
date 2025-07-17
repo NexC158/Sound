@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="C:\Users\PC\Desktop\BlazorAppExactlyWebAssemblyShared1\BlazorAppExactlyWebAssemblyShared.csproj" />
+    <ProjectReference Include="C:\Users\PC\Desktop\BlazorAppExactlyWebAssemblyShared\BlazorAppExactlyWebAssemblyShared.csproj" />
   </ItemGroup>
 
 </Project>
