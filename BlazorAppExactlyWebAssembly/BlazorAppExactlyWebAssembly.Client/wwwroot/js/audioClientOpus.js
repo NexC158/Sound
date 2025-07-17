@@ -5,12 +5,12 @@ const connectionForAudioHub = new signalR.HubConnectionBuilder()
     .withUrl("https://localhost:7069/hubs/audiohub")
     .build();
 
-connectionForAudioHub.on("SignalRHubStartStreamingCommand", async () => {
+connectionForAudioHub.on("OnCustomCommandStart", async () => {
 
     await startTranslate();
 });
 
-connectionForAudioHub.on("SignalRHubStopStreamingCommand", () => {
+connectionForAudioHub.on("OnCustomCommandStop", () => {
 
     stopTranslate();
 });
@@ -28,17 +28,24 @@ async function startTranslate() {
 
     subject = new signalR.Subject();
 
-    connectionForAudioHub.send("ReceiveAudioChunk", subject);
+    connectionForAudioHub.send("ReceiveAudioStream", subject);
 
     recorder = new Recorder({
-        encoderSampleRate: 16000,
+        encoderSampleRate: 8000,
         encoderPath: 'js/forOpusMinJs/encoderWorker.min.js',
         streamPages: true
     });
 
     recorder.ondataavailable = (typedArray) => {
+
+        console.log('Опусовский массив:', typedArray)
+
         if (isTransmitting && typedArray.length > 0) {
-            subject.next(typedArray);
+
+            for (i = 0; i < typedArray.length; i++) {
+
+                subject.next(typedArray[i]);
+            }
         }
     };
 
@@ -49,6 +56,7 @@ async function startTranslate() {
 function stopTranslate() {
     if (!isTransmitting) return;
     isTransmitting = false;
+    
     if (recorder) {
         recorder.stop();
         recorder = null;

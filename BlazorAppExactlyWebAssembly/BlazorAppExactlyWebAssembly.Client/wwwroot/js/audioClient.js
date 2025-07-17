@@ -59,7 +59,7 @@ async function startTranslate() {
 
     const subject = new signalR.Subject();
                         //send stream invoke
-    connectionForAudioHub.stream("GetBytesFromAudioStream", subject); //  GetBytesFromAudioStream
+    connectionForAudioHub.send("ReceiveAudioStream", subject); //  GetBytesFromAudioStream
 
     //yield connectionForAudioHub.send("GetBytesFromAudioStream", subject);
     //var iteration = 0;
@@ -103,9 +103,14 @@ async function startTranslate() {
             
             
             const whatIsToSend = new Uint8Array(int16Array.buffer);
+
+            for (i = 0; i < whatIsToSend.length; i++)
+            {
+                subject.next(whatIsToSend[i]);
+            }
             console.log('чанк в audioWorkletNode.port.onmessage:::', whatIsToSend);
 
-            subject.next(whatIsToSend); // отправка в hub командой subject.next
+            //subject.next(whatIsToSend); // отправка в hub командой subject.next
         }
         catch (err) {
             console.error("Ошибка получения данных из аудиопроцессора:", err);

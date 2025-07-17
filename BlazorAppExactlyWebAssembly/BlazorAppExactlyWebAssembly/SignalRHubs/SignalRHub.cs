@@ -1,8 +1,7 @@
-﻿using System.Net.Sockets;
-using System.Net;
-using System.Threading.Channels;
+﻿using Concentus;
+using Concentus.Structs;
 using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks.Dataflow;
+using System.Threading.Channels;
 
 namespace BlazorAppExactlyWebAssembly.SignalRHubShared;
 
@@ -12,19 +11,19 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
     private Channel<byte> _channel;
 
     private List<byte> _audioBuffer = new();
-    private const int _packetSize = 10; 
+    private const int _packetSize = 127;
+
+    private OpusDecoder _opusDecoder;
+    private const int _pcmSamples = 800; // 8000Hz * 0.1ms
 
     public SignalRHub(ILogger<SignalRHub> logger)
     {
         this._logger = logger;
 
-        var options = new BoundedChannelOptions(1)
-        {
-            SingleReader = true,
-            SingleWriter = false, // ?
-            FullMode = BoundedChannelFullMode.Wait
-        };
-        _channel = Channel.CreateBounded<byte>(options);
+        _channel = Channel.CreateUnbounded<byte>();
+        _opusDecoder = (OpusDecoder)OpusCodecFactory.CreateDecoder(8000, 1);
+
+        Task.Run(CreateAndSendAudioChunk);
     }
 
     public async Task OnStreamStarted()
@@ -62,7 +61,7 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
     {
         // this.Context.ConnectionId
         Console.WriteLine("STR: start stream");
-        
+
         try
         {
             Console.WriteLine("stream content: ");
@@ -80,28 +79,65 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
         }
     }
 
-    public async Task CreateAndSendAudioChunk()
+    public async Task IsHaveBytes()
     {
-        while (await _channel.Reader.WaitToReadAsync())
+        Console.WriteLine("IsHaveBytes");
+        var sum = 0;
+        var i = 0;
+        var countOfBytes = 2000;
+
+        await foreach (var b in _channel.Reader.ReadAllAsync())
         {
-            while (_channel.Reader.TryRead(out var b))
+            sum += b;
+            i++;
+            Console.Write($"{b} ");
+
+            if (i == countOfBytes)
             {
-                _audioBuffer.Add(b);
-                if (_audioBuffer.Count >= _packetSize)
-                {
-                    var packet = _audioBuffer.Take(_packetSize).ToArray();
-                    _audioBuffer.RemoveRange(0, _packetSize);
-                    await Clients.Others.OnAudioChunk(packet);
-                }
+                Console.WriteLine();
+                Console.WriteLine($"{sum}       {sum / countOfBytes}");
+                Console.WriteLine();
+                sum = 0;
+                i = 0;
             }
         }
     }
 
-    public async Task<string> GetHelloWorld()
+    public async Task CreateAndSendAudioChunk()
     {
-        Console.WriteLine($"Hello world: {this.Context.ConnectionId}");
-        Console.WriteLine($"features: [{string.Join(", ", this.Context.Features)}]");
-        return "hello word";
+        Console.WriteLine("CreateAndSendAudioChunk");
+        await foreach (var b in _channel.Reader.ReadAllAsync())
+        {
+            try
+            {
+                _audioBuffer.Add(b);
+                //Console.WriteLine($"    {b}     {_audioBuffer.Count}");
+                if (_audioBuffer.Count == _pcmSamples)
+                {
+                    var packet = _audioBuffer.ToArray();
+                    _audioBuffer.Clear(); // RemoveRange(0, _packetSize)
+
+                    var pcmBuf = new short[_pcmSamples];
+                    int samplesDecoded = _opusDecoder.Decode(packet.AsSpan(), pcmBuf.AsSpan(), _pcmSamples, false);
+                    // декодированный 
+                    byte[] pcmBytes = new byte[samplesDecoded * 2]; // short = 2 байта
+                    Buffer.BlockCopy(pcmBuf, 0, pcmBytes, 0, pcmBytes.Length);
+                    //foreach (var pcm in pcmBytes)
+                    //{
+                    //    Console.Write(pcm.ToString());
+                    //}
+                    //Console.WriteLine();
+
+                    //await Clients.Others.OnAudioChunk(packet);
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
+
+        }
     }
 }
 

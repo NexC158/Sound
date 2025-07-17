@@ -34,8 +34,4 @@
     <None Include="wwwroot\js\serverApi\index.ts" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="C:\Users\Дыня\source\repos\Sound\BlazorAppExactlyWebAssemblyShared\BlazorAppExactlyWebAssemblyShared.csproj" />
-  </ItemGroup>
-
 </Project>
