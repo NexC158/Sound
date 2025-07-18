@@ -2,6 +2,7 @@ using BlazorAppExactlyWebAssembly.Client.Pages;
 using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 using BlazorAppExactlyWebAssembly.Components;
 using BlazorAppExactlyWebAssembly.SignalRHubShared;
+using MessagePack;
 
 
 namespace BlazorAppExactlyWebAssembly
@@ -17,7 +18,14 @@ namespace BlazorAppExactlyWebAssembly
             builder.Services.AddRazorComponents()
                 .AddInteractiveWebAssemblyComponents();
 
-            builder.Services.AddSignalR();
+            builder.Services.AddSignalR().AddMessagePackProtocol(/*options =>  //  AddJsonProtocol()
+            {
+                options.SerializerOptions = MessagePackSerializerOptions.Standard
+                    .WithResolver(new CustomResolver())
+                    .WithSecurity(MessagePackSecurity.UntrustedData);
+            }*/);
+
+            
 
             builder.Services.AddTransient<ServerAPI>(); // some experiments AddTransient or AddScoped of AddSingleton
             builder.Services.AddSingleton<HubService>();

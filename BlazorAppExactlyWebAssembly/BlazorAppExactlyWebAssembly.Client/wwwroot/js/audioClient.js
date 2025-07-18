@@ -7,9 +7,14 @@ let isTransmitting = false; // Флаг активности передачи
 let portHandler = null; 
 let subject = null;
 
-const connectionForAudioHub = new signalR.HubConnectionBuilder()
+const connectionForAudioHub = new signalR
+    .HubConnectionBuilder()
     .withUrl("https://localhost:7069/hubs/audiohub")
+    .withAutomaticReconnect()
+    .withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol()) // new signalR.protocols.msgpack.MessagePackHubProtocol()  new MessagePackHubProtocol()
     .build();
+
+
 
 connectionForAudioHub.on("OnCustomCommandStart", async () => {
 
@@ -92,7 +97,7 @@ async function startTranslate() {
             }
             console.log('чанк в audioWorkletNode.port.onmessage:::', whatIsToSend);
 
-            subject.next(whatIsToSend); // отправка в hub командой subject.next
+            //subject.next(whatIsToSend); // отправка в hub командой subject.next
         }
         catch (err) {
             console.error("Ошибка получения данных из аудиопроцессора:", err);

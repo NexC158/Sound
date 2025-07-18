@@ -24,9 +24,9 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
         this._logger = logger;
 
         _channel = Channel.CreateUnbounded<byte>();
-        _opusDecoder = (OpusDecoder)OpusCodecFactory.CreateDecoder(8000, 1);
+        //_opusDecoder = (OpusDecoder)OpusCodecFactory.CreateDecoder(8000, 1);
 
-        Task.Run(CreateAndSendAudioChunk);
+        Task.Run(IsHaveBytes);
     }
 
     public async Task OnStreamStarted()
@@ -60,30 +60,23 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
         return base.OnDisconnectedAsync(exception);
     }
 
-    public async Task ReceiveAudioChunk(ChannelReader<byte[]> chunkStream)
+    public async Task ReceiveAudioStream(ChannelReader<byte> stream)
     {
         Console.WriteLine("STR: start stream");
-
         try
         {
-            Console.WriteLine("stream content: ");
-            await foreach (var chunkBytes in chunkStream.ReadAllAsync())
+            await foreach (var b in stream.ReadAllAsync())
             {
-                Console.Write($" {chunkBytes.Length}");
-
-                foreach (var baytik in chunkBytes)
-                {
-                    _channel.Writer.TryWrite(baytik);
-                }
+                _channel.Writer.TryWrite(b);
             }
-
             Console.WriteLine("STR: stop stream");
         }
         catch (Exception ex)
         {
             Console.WriteLine("STR: failed stream");
-            Console.WriteLine(ex.ToString());
+            Console.WriteLine($"ReceiveAudioStream {ex.Message}");
         }
+
     }
 
     public async Task IsHaveBytes()
@@ -110,7 +103,7 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
         }
     }
 
-    public async Task ReceiveAudioStream(ChannelReader<byte> stream)
+    public async Task CreateAndSendAudioChunk()
     {
         Console.WriteLine("CreateAndSendAudioChunk");
         await foreach (var b in _channel.Reader.ReadAllAsync())
@@ -138,30 +131,13 @@ public class SignalRHub : Hub<IAudioStreamReceiver>, ISignalRHub
                     //await Clients.Others.OnAudioChunk(packet);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            
+
 
         }
     }
-
-    //public async Task CreateAndSendAudioChunk()
-    //{
-    //    while (await _channel.Reader.WaitToReadAsync())
-    //    {
-    //        while (_channel.Reader.TryRead(out var b))
-    //        {
-    //            _audioBuffer.Add(b);
-    //            if (_audioBuffer.Count >= _packetSize)
-    //            {
-    //                var packet = _audioBuffer.Take(_packetSize).ToArray();
-    //                _audioBuffer.RemoveRange(0, _packetSize);
-    //                await Clients.Others.OnAudioChunk(packet);
-    //            }
-    //        }
-    //    }
-    //}
 }
 

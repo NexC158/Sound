@@ -25,3 +25,20 @@
 
             return Ok(new { recordKey = formFileName });
         }
+
+
+
+        https://learn.microsoft.com/ru-ru/aspnet/core/signalr/messagepackhubprotocol?view=aspnetcore-9.0 :::
+        {
+        
+                на клиенте установил npm install @microsoft/signalr-protocol-msgpack
+        }
+
+        Влез в tsconfig.json  добавил 
+        {
+        "target": "es2015", // или выше: 'es2020', 'esnext' и т.д.
+        "lib": [ "es2015", "dom" ],
+        "moduleResolution": "nodenext",
+        "module": "nodenext"
+        }
+

@@ -10,6 +10,7 @@
     <ProjectReference Include="..\BlazorAppExactlyWebAssembly.Client\BlazorAppExactlyWebAssembly.Client.csproj" />
     <PackageReference Include="Concentus" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="9.0.7" />
   </ItemGroup>
 
 </Project>
