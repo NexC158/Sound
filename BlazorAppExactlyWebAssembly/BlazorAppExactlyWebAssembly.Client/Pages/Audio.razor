@@ -2,11 +2,11 @@
 @rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false)) // либо так для каждого компонента СМОТРИ App.razor
 
 @using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
- @using Microsoft.AspNetCore.SignalR.Client 
+@using Microsoft.AspNetCore.SignalR.Client 
 
 @inject ServerAPI _api
-@inject NavigationManager Navigation
-@* @inject IJSRuntime JS *@
+@inject IJSRuntime JS 
+
 
 @* <dev>@(Program._dbg)</dev> *@
 
@@ -14,12 +14,11 @@
 
 @* <button class="btn btn-primary" @onclick="SoundStreaming">@(isActive ? "Stop translate" : "Start translate")</button> *@
 
-<button class="btn btn-primary" @onclick="StartTranslateSound">@("Start translate sound")</button>
+<button class="btn btn-primary" @onclick="StartTranslateSound">@("Start translate sound")</button> 
 
 <button class="btn btn-primary" @onclick="StopTranslateSound">@("Stop translate sound")</button>
 
 @code {
-    // private bool isActive = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -32,7 +31,6 @@
             Console.WriteLine($"OnInitializedAsync не прошел: {ex.Message}");
         }
     }
-
 
     private async Task StartTranslateSound()
     {
@@ -49,6 +47,17 @@
             await _api.StopStreamingCommand();
         }
     }
+
+    // JS
+    // private async Task StartTranslateSound()
+    // {
+    //     await JS.InvokeVoidAsync("startTranslate");
+    // }
+
+    // private async Task StopTranslateSound()
+    // {
+    //     await JS.InvokeVoidAsync("stopTranslate");
+    // }
 
 
     // private async Task SoundStreaming()

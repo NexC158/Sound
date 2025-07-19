@@ -8,7 +8,7 @@ class AudioProcessorClient extends AudioWorkletProcessor { // вот это со
             for (let channel = 0; channel < input.length; ++channel) {
                 output[channel].set(input[channel]);
             }
-            // дополнительно отправляю данные в порт, если нужно видеть байты
+            // дополнительно отправляю данные в порт, чтобы видеть байты
             this.port.postMessage(input[0].slice());
         }
         return true;

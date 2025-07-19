@@ -9,21 +9,15 @@ public class ServerAPI : IAsyncDisposable
 {
     private HubConnection _connection;
 
-    //private readonly NavigationManager _navigationManager;
-    public ServerAPI() //NavigationManager navigationManager
-    {
-        //_navigationManager = navigationManager ?? throw new ArgumentNullException(nameof(navigationManager));
+    private Timer _keepAlive;
 
+    public ServerAPI()
+    {
         _connection = new HubConnectionBuilder()
           .WithUrl("https://localhost:7069/hubs/blazor")
+          .WithAutomaticReconnect()
           .Build();
-
-        //_connection.StartAsync().Wait();
-
-        //.WithUrl("https://localhost:7069/hubs/blazor") //_navigationManager.ToAbsoluteUri("/hubs/blazor").WithAutomaticReconnect()
-        //_connection = BuildAndStartConnection().Result;
     }
-
     public async Task<HubConnection> InitializeAsync()
     {
         var connection = _connection;
@@ -31,7 +25,7 @@ public class ServerAPI : IAsyncDisposable
         {
             await connection.StartAsync();
         }
-
+        KeepAliveTimer();
         return connection;
     }
 
@@ -48,6 +42,24 @@ public class ServerAPI : IAsyncDisposable
         Console.WriteLine("ServerAPI StopStreamingCommand done");
     }
 
+    private void KeepAliveTimer() // Сделал потому что начал ловить ошибку и предупреждение, из-за того, что соединение простаивало
+    {
+        _keepAlive = new Timer(async _ =>
+        {
+            if (_connection.State == HubConnectionState.Connected)
+            {
+                try
+                {
+                    await _connection.InvokeAsync("Pig");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"ServerAPI KeepAliveTimer: {ex.Message}");
+                }
+            }
+        }, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+    }
+
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         var connection = _connection;
@@ -57,9 +69,17 @@ public class ServerAPI : IAsyncDisposable
         if (connection != null)
         {
             await connection.DisposeAsync();
+            _keepAlive.Dispose();
         }
     }
 }
+
+
+
+//_connection.StartAsync().Wait();
+
+//.WithUrl("https://localhost:7069/hubs/blazor") //_navigationManager.ToAbsoluteUri("/hubs/blazor").WithAutomaticReconnect()
+//_connection = BuildAndStartConnection().Result;
 
 //public async Task<(bool isFailed, string failedReaaon)> Init()
 //{
@@ -116,5 +136,3 @@ public class ServerAPI : IAsyncDisposable
 //        return ex.ToString();
 //    }
 //}
-
-

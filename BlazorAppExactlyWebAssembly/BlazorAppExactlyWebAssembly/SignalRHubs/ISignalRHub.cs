@@ -6,11 +6,9 @@ namespace BlazorAppExactlyWebAssembly.SignalRHubShared;
 [Hub]
 public interface ISignalRHub
 {
-    //Task StartStreamingCommand();
-    //Task StopStreamingCommand();
-   // string GetMyConnectionId();
-    //Task CreateAndSendAudioChunk();
-    Task ReceiveAudioStream(ChannelReader<byte> stream);
+    string GetMyConnectionId();
 
+    //Task CreateAndSendAudioChunk();
+    //Task ReceiveAudioStream(ChannelReader<byte> stream);
 }
 

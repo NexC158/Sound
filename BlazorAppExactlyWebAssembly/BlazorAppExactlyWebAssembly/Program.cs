@@ -1,8 +1,7 @@
-using BlazorAppExactlyWebAssembly.Client.Pages;
+using BlazorAppExactlyWebAssembly.AudioService;
 using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 using BlazorAppExactlyWebAssembly.Components;
 using BlazorAppExactlyWebAssembly.SignalRHubShared;
-using MessagePack;
 
 
 namespace BlazorAppExactlyWebAssembly
@@ -13,34 +12,7 @@ namespace BlazorAppExactlyWebAssembly
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
-            // Add services to the container.
-            builder.Services.AddRazorComponents()
-                .AddInteractiveWebAssemblyComponents();
-
-            builder.Services.AddSignalR().AddMessagePackProtocol(/*options =>  //  AddJsonProtocol()
-            {
-                options.SerializerOptions = MessagePackSerializerOptions.Standard
-                    .WithResolver(new CustomResolver())
-                    .WithSecurity(MessagePackSecurity.UntrustedData);
-            }*/);
-
-            
-
-            builder.Services.AddTransient<ServerAPI>(); // some experiments AddTransient or AddScoped of AddSingleton
-            builder.Services.AddSingleton<HubService>();
-            builder.Services.AddSingleton<IAudioStreamReceiver>(sp => (IAudioStreamReceiver)sp.GetRequiredService<HubService>());
-
-            builder.Services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(policy =>
-                {
-                    policy.AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials()
-                          .WithOrigins("https://localhost:7069");
-                });
-            });
+            Startup.ConfigureServices(builder.Services);
 
             var app = builder.Build();
 
@@ -71,7 +43,9 @@ namespace BlazorAppExactlyWebAssembly
 
             app.MapHub<SignalRHub>("/hubs/audiohub");
             app.MapHub<SignalRHubForBlazor>("/hubs/blazor");
-            
+
+            app.MapControllers();
+
 
             app.Run();
         }

@@ -1,7 +1,4 @@
-﻿
-
-
-        [HttpPost]
+﻿        [HttpPost]
         [Route("/VoiceLibrary/Upload/")]
         public async Task<IActionResult> UploadVoiceFile(IFormFile formFile)
         {
@@ -32,6 +29,7 @@
         {
         
                 на клиенте установил npm install @microsoft/signalr-protocol-msgpack
+                из-за этого добавилась папка node_modules и из-за этого пришлось лезть в tsconfig.json
         }
 
         Влез в tsconfig.json  добавил 

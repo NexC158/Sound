@@ -14,6 +14,12 @@ public class SignalRHubForBlazor : Hub
         _hubService = hubService;
     }
 
+    public Task Pig()
+    {
+        Console.WriteLine($"Pig from ServerAPI: {Context.ConnectionId}");
+        return Task.CompletedTask;
+    }
+
     public async Task HubStartStreamingCommand()
     {
         Console.WriteLine("SignalRHubForBlazor HubStartStreamingCommand ");

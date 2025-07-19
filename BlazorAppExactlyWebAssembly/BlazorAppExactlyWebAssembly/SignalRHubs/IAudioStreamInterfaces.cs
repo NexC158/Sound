@@ -12,10 +12,10 @@ public interface IAudioStreamService
 [Receiver]
 public interface IAudioStreamReceiver
 {
-    Task OnStreamStarted();
-    Task OnStreamStopped();
-    Task OnRemoveStream();
-    Task OnAudioChunk(byte[] chunk);
+    //Task OnStreamStarted();
+    //Task OnStreamStopped();
+    //Task OnRemoveStream();
+    //Task OnAudioChunk(byte[] chunk);
     Task OnCustomCommandStart();
     Task OnCustomCommandStop();
 
