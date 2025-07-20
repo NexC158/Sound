@@ -4,7 +4,7 @@
 @using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 @using Microsoft.AspNetCore.SignalR.Client 
 
-@inject ServerAPI _api
+@* @inject ServerAPI _api *@
 @inject IJSRuntime JS 
 
 
@@ -20,60 +20,42 @@
 
 @code {
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            await _api.InitializeAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"OnInitializedAsync не прошел: {ex.Message}");
-        }
-    }
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     try
+    //     {
+    //         await _api.InitializeAsync();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine($"OnInitializedAsync не прошел: {ex.Message}");
+    //     }
+    // }
 
-    private async Task StartTranslateSound()
-    {
-        if (_api is not null)
-        {
-            await _api.StartStreamingCommand();
-        }
-    }
-
-    private async Task StopTranslateSound()
-    {
-        if (_api is not null)
-        {
-            await _api.StopStreamingCommand();
-        }
-    }
-
-    // JS
     // private async Task StartTranslateSound()
     // {
-    //     await JS.InvokeVoidAsync("startTranslate");
+    //     if (_api is not null)
+    //     {
+    //         await _api.StartStreamingCommand();
+    //     }
     // }
 
     // private async Task StopTranslateSound()
     // {
-    //     await JS.InvokeVoidAsync("stopTranslate");
-    // }
-
-
-    // private async Task SoundStreaming()
-    // {
     //     if (_api is not null)
     //     {
-    //         if (isActive is false)
-    //         {
-    //             await _api.StartStreamingCommand();
-    //         }
-    //         else
-    //         {
-    //             await _api.StopStreamingCommand();
-    //         }
-    //         isActive = !isActive;
+    //         await _api.StopStreamingCommand();
     //     }
-    //     return;
     // }
+
+    // JS
+    private async Task StartTranslateSound()
+    {
+        await JS.InvokeVoidAsync("startTranslate");
+    }
+
+    private async Task StopTranslateSound()
+    {
+        await JS.InvokeVoidAsync("stopTranslate");
+    }
 }

@@ -1,5 +1,4 @@
-﻿using BlazorAppExactlyWebAssembly.AudioService;
-using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
+﻿using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 using BlazorAppExactlyWebAssembly.SignalRHubShared;
 
 namespace BlazorAppExactlyWebAssembly;
@@ -30,8 +29,6 @@ public class Startup
         services.AddSingleton<HubService>();
 
         services.AddSingleton<IAudioStreamReceiver>(sp => (IAudioStreamReceiver)sp.GetRequiredService<HubService>());
-
-        services.AddSingleton<AudioPlayerService>();
 
         services.AddCors(options =>
         {

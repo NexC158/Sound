@@ -1,4 +1,4 @@
-﻿using BlazorAppExactlyWebAssembly.AudioService;
+﻿using BlazorAppExactlyWebAssembly.ServerWorkingWithAudio;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -9,7 +9,10 @@ public class AudioController : ControllerBase
     [HttpPost("stream")]
     public async Task<IActionResult> UploadStream()
     {
-        var buffer = new byte[256]; //  128, 256, 512, 1024, 2048, 4096
+        var buffer = new byte[2048]; //  128, 256, 512, 1024, 2048, 4096
+
+        List<byte> inputBuffer = new List<byte>();
+
         int bytesRead;
         long total = 0;
 
@@ -19,41 +22,40 @@ public class AudioController : ControllerBase
         {
             total += bytesRead;
 
-            
-            for (int i = 0; i < bytesRead; i++) // вывожу каждый принятый байт
+            inputBuffer.AddRange(buffer.Take(bytesRead));
+            var header = inputBuffer.GetRange(0, 2).ToArray();
+
+            while (inputBuffer.Count >= 2)
             {
-                // Console.Write($"{buffer[i]:X2} "); // хекс
-                Console.Write($"{buffer[i]} "); // десятичная
+                var realOpusFramelenght = BitConverter.ToUInt16(header, 0);
+
+                if (inputBuffer.Count < realOpusFramelenght + 2)
+                {
+                    break;
+                }
+
+                
+                byte[] opusFrame = inputBuffer.Skip(2).Take(realOpusFramelenght).ToArray();
+
+                Console.WriteLine($"пришедший пакет {inputBuffer.Count}");
+                Console.WriteLine($"opusFrame.Length: {opusFrame.Length}");
+
+                AudioOpusDecodingAndPlay.DecodingAndPlayOpusBuffer(opusFrame);
+
+                inputBuffer.RemoveRange(0, realOpusFramelenght + 2);
             }
 
-            Console.WriteLine($"\nПринято: {bytesRead} байт | Всего: {total} байт\n");
+            //for (int i = 0; i < bytesRead; i++) // вывожу каждый принятый байт
+            //{
+            //    Console.Write($"{buffer[i]} "); // десятичная
+            //}
+
+            //Console.WriteLine($"\nПринято: {bytesRead - 2} байт | Всего: {total} байт\n");
         }
 
         Console.WriteLine("Конец потока");
 
         return Ok(new { bytesReceived = total });
-    }
-
-
-    [HttpPost("play")]
-    public async Task<IActionResult> PlayAudioStream()
-    {
-        var buffer = new byte[256];
-        using var memoryStream = new MemoryStream();
-        int bytesRead;
-
-        while ((bytesRead = await Request.Body.ReadAsync(buffer)) > 0)
-        {
-            memoryStream.Write(buffer, 0, bytesRead);
-        }
-
-        byte[] audioBytes = memoryStream.ToArray();
-
-        // Воспроизведение:
-        var player = new AudioPlayerService(); // или через DI
-        player.PlayRawPcm(audioBytes);
-
-        return Ok();
     }
 }
 

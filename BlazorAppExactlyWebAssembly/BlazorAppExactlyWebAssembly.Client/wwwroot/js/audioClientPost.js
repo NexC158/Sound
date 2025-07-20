@@ -47,15 +47,7 @@ async function startTranslate() {
             }
         });
 
-        //fetch("/api/audioplayback/play", {
-        //    method: "POST",
-        //    body: JSON.stringify([...uint8Array]), // byteArray — Uint8Array
-        //    headers: {
-        //        "Content-Type": "application/json"
-        //    }
-        //});
-
-        fetch('/api/audio/play', { // отправка потока fetch-ом
+        fetch('/api/audio/stream', { // отправка потока fetch-ом
 
             method: 'POST',
             body: stream,
@@ -104,8 +96,13 @@ async function startTranslate() {
 
 function stopTranslate() {
 
-    isTransmitting = false;
+    console.log('Команда остановки передачи')
+    if (!isTransmitting) {
 
+        console.log('Передача уже остановлена');
+        return;
+    }
+    isTransmitting = false;
 
     if (controllerRef) { // Закрытие стрима
 
