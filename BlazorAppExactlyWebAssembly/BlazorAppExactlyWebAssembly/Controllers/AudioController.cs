@@ -23,27 +23,30 @@ public class AudioController : ControllerBase
             total += bytesRead;
 
             inputBuffer.AddRange(buffer.Take(bytesRead));
-            var header = inputBuffer.GetRange(0, 2).ToArray();
+            //var header = inputBuffer.GetRange(0, 2).ToArray();
 
             while (inputBuffer.Count >= 2)
             {
-                var realOpusFramelenght = BitConverter.ToUInt16(header, 0);
+                //var realOpusFramelenght = BitConverter.ToUInt16(header, 0);
 
-                if (inputBuffer.Count < realOpusFramelenght + 2)
+                ushort realOpusFrameLength = (ushort)(inputBuffer[0] | (inputBuffer[1] << 8));
+
+                if (inputBuffer.Count < realOpusFrameLength + 2)
                 {
                     break;
                 }
 
-                
-                byte[] opusFrame = inputBuffer.Skip(2).Take(realOpusFramelenght).ToArray();
+
+                byte[] opusFrame = inputBuffer.Skip(2).Take(realOpusFrameLength).ToArray();
 
                 Console.WriteLine($"пришедший пакет {inputBuffer.Count}");
                 Console.WriteLine($"opusFrame.Length: {opusFrame.Length}");
 
-                AudioOpusDecodingAndPlay.DecodingAndPlayOpusBuffer(opusFrame);
+                inputBuffer.RemoveRange(0, realOpusFrameLength + 2);
 
-                inputBuffer.RemoveRange(0, realOpusFramelenght + 2);
+                AudioOpusDecodingAndPlay.DecodingAndPlayOpusBuffer(opusFrame);                
             }
+        }
 
             //for (int i = 0; i < bytesRead; i++) // вывожу каждый принятый байт
             //{
@@ -51,7 +54,7 @@ public class AudioController : ControllerBase
             //}
 
             //Console.WriteLine($"\nПринято: {bytesRead - 2} байт | Всего: {total} байт\n");
-        }
+        //}
 
         Console.WriteLine("Конец потока");
 

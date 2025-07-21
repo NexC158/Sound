@@ -8,7 +8,7 @@ let recorder = null;
 const connectionForAudioHub = new signalR
     .HubConnectionBuilder()
     .withUrl("https://localhost:7069/hubs/audiohub")
-    //.withAutomaticReconnect() // хз
+    .withAutomaticReconnect() // хз
     //.withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol()) // new signalR.protocols.msgpack.MessagePackHubProtocol()  new MessagePackHubProtocol()
     .build();
 
@@ -31,7 +31,7 @@ async function startTranslate() {
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            isTransmitting = true;
+            
             // alert('Доступ к микрофону получен!');
         }
         catch (err) {
@@ -41,6 +41,17 @@ async function startTranslate() {
     }
 
     try {
+
+        if (isTransmitting) {
+            console.warn('Передача уже идёт');
+            return;
+        }
+
+        if (recorder) {
+            recorder.stop();
+            recorder = null;
+        }
+
         const stream = new ReadableStream({ // стартую ReadableStream для POST
 
             start(controller) {
@@ -71,46 +82,42 @@ async function startTranslate() {
         recorder = new Recorder({
 
             encoderSampleRate: 8000,
-            encoderPath: 'js/forOpusMinJs/encoderWorker.min.js',
             encoderFrameSize: 20,
             bitrate: 16000, // 16000
-            // cbr: true, 
-            streamPages: true
+            cbr: true,
+            streamPages: true,
+            maxFramesPerPage: 1,
+            encoderPath: 'lib/opus-recorder-master/dist/encoderWorker.min.js'
         });
 
         recorder.ondataavailable = (typedArray) => {
 
             if (isTransmitting && typedArray.length > 0 && controllerRef) {
 
-                console.log('массив в опусе', typedArray);
+                const now = new Date().toISOString();
+                console.log(`[ondataavailable] ${now} → ${typedArray.length} байт`);
+
+
+                //console.log('массив в опусе', typedArray);
 
                 const len = typedArray.length;
-                const header = new Uint8Array([len & 0xff, (len >> 8) & 0xff]);
-                const payload = new Uint8Array(len + 2);
+                const header = new Uint8Array(2);
+                header[0] = len & 0xff;
+                header[1] = (len >> 8) & 0xff;
+
+                const payload = new Uint8Array(len + header.length); // len + 2
                 payload.set(header, 0);
                 payload.set(typedArray, 2);
 
-                // chunkBuffer.push(typedArray);
-                //if (chunkBuffer.length >= chunkSize) {
+                
 
-                    // склейка всех opus страниц в один Uint8Array
-                    //let totalLength = chunkBuffer.reduce((acc, arr) => acc + arr.length, 0);
-                    //let merged = new Uint8Array(totalLength);
-                    //let offset = 0;
-                    //chunkBuffer.forEach(arr => {
-                    //    merged.set(arr, offset);
-                    //    offset += arr.length;
-                    //});
-                    //controllerRef.enqueue(merged);
-                    //chunkBuffer = [];
-                //}
-
-                console.log('Отсылаю массив в опусе с добавленной длинной', payload);
+                //console.log('Отсылаю массив в опусе с добавленной длинной', payload);
 
                 controllerRef.enqueue(payload);
             }
         };
-        recorder.start(mediaStream);
+        await recorder.start(mediaStream);
+        isTransmitting = true;
     }
     catch (err) {
         console.error("Ошибка получения данных из аудиопроцессора:", err);
@@ -152,4 +159,23 @@ function stopTranslate() {
 //        controllerRef.close();
 //        controllerRef = null;
 //    }
+//}
+
+
+
+// это было в recorder.ondataavailable:
+
+// chunkBuffer.push(typedArray);
+//if (chunkBuffer.length >= chunkSize) {
+
+// склейка всех opus страниц в один Uint8Array
+//let totalLength = chunkBuffer.reduce((acc, arr) => acc + arr.length, 0);
+//let merged = new Uint8Array(totalLength);
+//let offset = 0;
+//chunkBuffer.forEach(arr => {
+//    merged.set(arr, offset);
+//    offset += arr.length;
+//});
+//controllerRef.enqueue(merged);
+//chunkBuffer = [];
 //}
