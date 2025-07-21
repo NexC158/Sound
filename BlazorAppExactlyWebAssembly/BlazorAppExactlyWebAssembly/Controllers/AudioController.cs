@@ -9,7 +9,7 @@ public class AudioController : ControllerBase
     [HttpPost("stream")]
     public async Task<IActionResult> UploadStream()
     {
-        var buffer = new byte[2048]; //  128, 256, 512, 1024, 2048, 4096
+        var buffer = new byte[512]; //  128, 256, 512, 1024, 2048, 4096
 
         List<byte> inputBuffer = new List<byte>();
 
@@ -18,43 +18,38 @@ public class AudioController : ControllerBase
 
         Console.WriteLine("AudioController UploadStream Старт приёма аудиопотока...\n");
 
-        while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        while ((bytesRead = await Request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0) // логику ниже можно засунуть в одельный метод
         {
             total += bytesRead;
 
+            Console.WriteLine($"AudioController UploadStream прочитал: {bytesRead}\n");
+
             inputBuffer.AddRange(buffer.Take(bytesRead));
-            //var header = inputBuffer.GetRange(0, 2).ToArray();
+            
 
             while (inputBuffer.Count >= 2)
             {
-                //var realOpusFramelenght = BitConverter.ToUInt16(header, 0);
+                var header = inputBuffer.GetRange(0, 2).ToArray();
+                var realOpusFrameLength = BitConverter.ToUInt16(header, 0);
 
-                ushort realOpusFrameLength = (ushort)(inputBuffer[0] | (inputBuffer[1] << 8));
+                Console.WriteLine($"UploadStream заголовок: {realOpusFrameLength}");
 
                 if (inputBuffer.Count < realOpusFrameLength + 2)
                 {
+                    Console.WriteLine("AudioController UploadStream [break]");
                     break;
                 }
 
-
                 byte[] opusFrame = inputBuffer.Skip(2).Take(realOpusFrameLength).ToArray();
 
-                Console.WriteLine($"пришедший пакет {inputBuffer.Count}");
-                Console.WriteLine($"opusFrame.Length: {opusFrame.Length}");
+                Console.WriteLine($"UploadStream размер кадра: {opusFrame.Length}");
 
-                inputBuffer.RemoveRange(0, realOpusFrameLength + 2);
+                inputBuffer.RemoveRange(0, realOpusFrameLength + header.Length);
 
-                AudioOpusDecodingAndPlay.DecodingAndPlayOpusBuffer(opusFrame);                
+                //Console.WriteLine($"AudioController UploadStream передал в декодинг {opusFrame.Length}\n");
+                AudioOpusDecodingAndPlay.DecodingFrames(opusFrame);                
             }
         }
-
-            //for (int i = 0; i < bytesRead; i++) // вывожу каждый принятый байт
-            //{
-            //    Console.Write($"{buffer[i]} "); // десятичная
-            //}
-
-            //Console.WriteLine($"\nПринято: {bytesRead - 2} байт | Всего: {total} байт\n");
-        //}
 
         Console.WriteLine("Конец потока");
 

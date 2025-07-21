@@ -40,3 +40,4 @@
         "module": "nodenext"
         }
 
+        подрубил https://github.com/tj10200/raw-opus-stream-recorder
