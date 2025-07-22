@@ -96,7 +96,7 @@ async function startTranslate() {
     recorder.ondataavailable = (typedArray) => { // TODO: реализовать остановку только после того, как передастся то, что уже записывается
         // на 20 мс это будет незаметно, но вот такой минус тут есть
 
-        if (isTransmitting || isStopping && typedArray.length > 0 && controllerRef) {
+        if ((isTransmitting || isStopping) && typedArray.length > 0 && controllerRef) {
 
             const now = new Date().toISOString();
 
@@ -158,10 +158,10 @@ async function stopTranslate() {
 
     if (controllerRef) {
 
-        stopPromise = new Promise((resolve) => stopResolve = resolve);
+        //stopPromise = new Promise((resolve) => stopResolve = resolve);
 
-        console.log("Ожидаю отправку последнего кадра...");
-        await stopPromise;
+        //console.log("Ожидаю отправку последнего кадра...");
+        //await stopPromise;
 
         controllerRef.close();
         controllerRef = null;
