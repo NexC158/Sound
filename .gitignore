@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/BlazorAppExactlyWebAssembly/BlazorAppExactlyWebAssembly.Client/wwwroot/signalRlib/microsoft/signalr/src
