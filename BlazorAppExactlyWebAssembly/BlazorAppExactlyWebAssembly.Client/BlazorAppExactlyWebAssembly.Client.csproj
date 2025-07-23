@@ -23,4 +23,8 @@
     <PackageReference Include="TypedSignalR.Client.TypeScript.Attributes" Version="1.15.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\signalRlib\" />
+  </ItemGroup>
+
 </Project>

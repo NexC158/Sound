@@ -13,16 +13,11 @@
 </head>
 
 <body>
-    <Routes /> @* либо так для всех смотри Audio.razor <Routes @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)"/>*@
+    <Routes />
     <script src="_framework/blazor.web.js"></script>
     <script src="signalRlib/microsoft/signalr/dist/browser/signalr.js"></script>
-    <script src="js/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.js"></script>
     <script src="lib/raw-opus-stream-recorder/dist/recorder.min.js"></script>
-    @* <script src="js/audioClient.js"></script> *@
-@*     <script src="js/audioClientPost.js"></script> *@
     <script src="js/audioClientPostOpus.js"></script>
-    @* <script src="js/audioClientOpus.js"></script> *@ 
-
 </body>
 
 </html>

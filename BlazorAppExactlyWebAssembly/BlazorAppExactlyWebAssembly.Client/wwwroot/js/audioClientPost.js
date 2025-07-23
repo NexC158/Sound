@@ -7,8 +7,7 @@ let isTransmitting = false;
 const connectionForAudioHub = new signalR
     .HubConnectionBuilder()
     .withUrl("https://localhost:7069/hubs/audiohub")
-    .withAutomaticReconnect() // хз
-    .withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol()) // new signalR.protocols.msgpack.MessagePackHubProtocol()  new MessagePackHubProtocol()
+    .withAutomaticReconnect()
     .build();
 
 connectionForAudioHub.on("OnCustomCommandStart", async () => {
@@ -32,7 +31,7 @@ async function startTranslate() {
 
         mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true }); // запрос микрофона
 
-        const stream = new ReadableStream({ // стартую ReadableStream для POST
+        const stream = new ReadableStream({ // для Post
 
             start(controller) {
 
@@ -47,7 +46,7 @@ async function startTranslate() {
             }
         });
 
-        fetch('/api/audio/stream', { // отправка потока fetch-ом
+        fetch('/api/audio/stream', {
 
             method: 'POST',
             body: stream,
@@ -55,7 +54,7 @@ async function startTranslate() {
 
                 'Content-Type': 'application/octet-stream'
             },
-            duplex: "half"
+            duplex: "half" // важно
         }).then(res => console.log('поток успешно отправился:', res))
             .catch(err => console.error('Ошибка при отправке:', err));
 
@@ -84,7 +83,7 @@ async function startTranslate() {
             
             const uint8Array = new Uint8Array(int16Array.buffer);
             console.log('audioClientForRestApi event :', uint8Array);
-            controllerRef.enqueue(uint8Array); // Потоковая отправка
+            controllerRef.enqueue(uint8Array);
         };
 
         isTransmitting = true;
