@@ -45,7 +45,7 @@ https://learn.microsoft.com/ru-ru/aspnet/core/signalr/messagepackhubprotocol?vie
 
 ## work with pipi
 
-sync Task FillPipeAsync(Socket socket, PipeWriter writer, CancellationToken stopReceivingTocken)
+async Task FillPipeAsync(Socket socket, PipeWriter writer, CancellationToken stopReceivingTocken)
 {
     while (true)
     {

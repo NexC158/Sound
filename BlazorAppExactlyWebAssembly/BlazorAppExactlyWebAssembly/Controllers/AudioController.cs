@@ -1,5 +1,8 @@
-﻿using BlazorAppExactlyWebAssembly.ServerWorkingWithAudio;
+﻿using System.IO.Pipelines;
+using BlazorAppExactlyWebAssembly.ServerWorkingWithAudio;
 using Microsoft.AspNetCore.Mvc;
+
+using BlazorAppExactlyWebAssembly.ServerAudioWorking;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -7,6 +10,24 @@ public class AudioController : ControllerBase
 {
 
     [HttpPost("stream")]
+    public async Task<IActionResult> UploadStreamWithPipe()
+    {
+        Console.WriteLine("AudioController UploadStream стартует...\n");
+
+        var pipe = new Pipe();
+        var workPipe = new PipeLineMethods();
+        var writing = workPipe.FillPipeAsync(Request.Body, pipe.Writer);
+        var reading = workPipe.ReadPipeAsync(pipe.Reader);
+
+        await Task.WhenAll(writing, reading);
+
+        Console.WriteLine("AudioController UploadStreamWithPipe завершен\n");
+
+        return Ok();
+    }
+
+
+    [HttpPost("streamBadBuffer")]
     public async Task<IActionResult> UploadStreamWithBadBuffer()
     {
         var buffer = new byte[512]; //  128, 256, 512, 1024, 2048, 4096

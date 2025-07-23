@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Buffers;
+using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using Concentus;
 using Concentus.Structs;
 using NAudio.Wave;
@@ -13,11 +15,11 @@ public class AudioOpusDecodingAndPlay
     private static readonly int _numberOfSamples = _sampleRate * _opusFrameInMiliseconds / 1000;
 
     private static IOpusDecoder _decoder = OpusCodecFactory.CreateDecoder(_sampleRate, _channels);
-    private static BufferedWaveProvider _bufferedWaveProvider = null;
-    private static WaveOutEvent _waveOut = null;
+    private static BufferedWaveProvider ?_bufferedWaveProvider = null;
+    private static WaveOutEvent ?_waveOut = null;
     private static bool _initialized = false;
 
-    public static void DecodingFrames(byte[] opusFrameData)
+    public static void DecodingFrames(ReadOnlySpan<byte> opusFrameData)
     {
         try
         {            
@@ -27,10 +29,9 @@ public class AudioOpusDecodingAndPlay
                 return; 
             }
 
-            Span<byte> opusSpan = opusFrameData.AsSpan();
             Span<float> pcmFloatSpan = new float[_numberOfSamples];
 
-            int samplesDecoded = _decoder.Decode(opusSpan, pcmFloatSpan, pcmFloatSpan.Length, false); 
+            int samplesDecoded = _decoder.Decode(opusFrameData, pcmFloatSpan, pcmFloatSpan.Length, false); 
 
             if (samplesDecoded <= 0)
             {
@@ -66,15 +67,15 @@ public class AudioOpusDecodingAndPlay
 
             _bufferedWaveProvider = new BufferedWaveProvider(waveFormat)
             {
-                BufferLength = 4096, // минимально допустимый буфер
-                BufferDuration = TimeSpan.FromMilliseconds(100), // если поддерживается
+                BufferLength = 4096, // минимально допустимый
+                BufferDuration = TimeSpan.FromMilliseconds(100),
                 DiscardOnBufferOverflow = true
             };
 
             _waveOut = new WaveOutEvent()
             {
                 DesiredLatency = 50,
-                NumberOfBuffers = 3 // меньше буферов = ниже задержка, но больше шанс заикания
+                NumberOfBuffers = 3
             };
 
             _waveOut.Init(_bufferedWaveProvider);
@@ -83,7 +84,6 @@ public class AudioOpusDecodingAndPlay
             _initialized = true;
         }
 
-        _bufferedWaveProvider.AddSamples(pcmBytes, 0, pcmBytes.Length);
-
+        _bufferedWaveProvider?.AddSamples(pcmBytes, 0, pcmBytes.Length);
     }
 }
