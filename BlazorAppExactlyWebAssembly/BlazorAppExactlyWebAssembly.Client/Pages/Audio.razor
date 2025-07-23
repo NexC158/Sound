@@ -1,18 +1,11 @@
 ﻿@page "/audioApp"
-@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false)) // либо так для каждого компонента СМОТРИ App.razor
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
 @using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 @using Microsoft.AspNetCore.SignalR.Client 
 
 @inject ServerAPI _api
-@inject IJSRuntime JS 
-
-
-@* <dev>@(Program._dbg)</dev> *@
-
-@* <dev>@(ServerAPI.BuildAndStartConnection_test())</dev>  *@
-
-@* <button class="btn btn-primary" @onclick="SoundStreaming">@(isActive ? "Stop translate" : "Start translate")</button> *@
+@* @inject IJSRuntime JS *@
 
 <button class="btn btn-primary" @onclick="StartTranslateSound">@("Start translate sound")</button> 
 
@@ -32,7 +25,7 @@
         }
     }
 
-    private async Task StartTranslateSound()
+    private async Task StartTranslateSound() // пересмотреть
     {
         if (_api is not null)
         {
