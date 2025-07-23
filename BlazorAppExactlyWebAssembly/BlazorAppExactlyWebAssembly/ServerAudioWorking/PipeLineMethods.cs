@@ -90,9 +90,7 @@ namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
 
             frame = sequenceReader.UnreadSpan.Slice(0, frameLength);
             sequenceReader.Advance(frameLength);
-
-            Console.WriteLine($"AudioOpusDecodingAndPlay TryReadFrame принял фрейм опуса {frameLength}");
-
+            //Console.WriteLine($"AudioOpusDecodingAndPlay TryReadFrame принял фрейм опуса {frameLength}");
             return true;
         }
     }

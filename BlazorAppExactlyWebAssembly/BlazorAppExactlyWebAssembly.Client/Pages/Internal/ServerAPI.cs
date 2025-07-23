@@ -9,7 +9,7 @@ public class ServerAPI : IAsyncDisposable
 {
     private HubConnection _connection;
 
-    private Timer _keepAlive;
+    private Timer ?_keepAlive;
 
     public ServerAPI()
     {
@@ -69,7 +69,7 @@ public class ServerAPI : IAsyncDisposable
         if (connection != null)
         {
             await connection.DisposeAsync();
-            _keepAlive.Dispose();
+            _keepAlive!.Dispose();
         }
     }
 }

@@ -12,7 +12,7 @@ public class AudioController : ControllerBase
     [HttpPost("stream")]
     public async Task<IActionResult> UploadStreamWithPipe()
     {
-        Console.WriteLine("AudioController UploadStream стартует...\n");
+        //Console.WriteLine("AudioController UploadStream стартует...\n");
 
         var pipe = new Pipe();
         var workPipe = new PipeLineMethods();
@@ -21,7 +21,7 @@ public class AudioController : ControllerBase
 
         await Task.WhenAll(writing, reading);
 
-        Console.WriteLine("AudioController UploadStreamWithPipe завершен\n");
+        //Console.WriteLine("AudioController UploadStreamWithPipe завершен\n");
 
         return Ok();
     }
@@ -67,7 +67,6 @@ public class AudioController : ControllerBase
 
                 inputBuffer.RemoveRange(0, realOpusFrameLength + header.Length);
 
-                //Console.WriteLine($"AudioController UploadStream передал в декодинг {opusFrame.Length}\n");
                 AudioOpusDecodingAndPlay.DecodingFrames(opusFrame);                
             }
         }
