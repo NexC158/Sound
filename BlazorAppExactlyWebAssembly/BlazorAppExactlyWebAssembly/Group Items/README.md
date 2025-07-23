@@ -445,3 +445,65 @@ public class RhqVoiceRecordStream
     "@types/node": "^24.0.14"
   }
 }
+
+
+
+
+#### package.json в raw-opus
+
+{
+  "name": "raw-opus-stream-recorder",
+  "version": "1.0.2",
+  "description": "A library for recording opus encoded audio",
+  "homepage": "https://github.com/tj10200/raw-opus-stream-recorder",
+  "author": "TJ Johnson",
+  "keywords": [
+    "Ogg",
+    "Opus",
+    "PCM",
+    "Decoder",
+    "Resampler",
+    "Streamer",
+    "Audio",
+    "Microphone",
+    "Recorder",
+    "Wav",
+    "Wave",
+    "WebAssembly"
+  ],
+  "license": "MIT",
+  "main": "dist/recorder.min.js",
+  "files": [
+    "dist/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tj10200/raw-opus-stream-recorder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tj10200/raw-opus-stream-recorder/issues",
+    "email": "tjjohnson10200@gmail.com"
+  },
+  "scripts": {
+    "make": "make",
+    "test": "make test",
+    "webpack": "webpack"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "babel-loader": "^8.1.0",
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
+    "promise": "^8.1.0",
+    "require-uncached": "^2.0.0",
+    "sinon": "^9.0.2",
+    "sinon-chai": "^3.5.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  },
+  "dependencies": {}
+}
+
+
+####
