@@ -102,10 +102,10 @@ async function startTranslate() {
 
             if ((isTransmitting || isStopping) && typedArray.length > 0 && controllerRef) {
 
-                const now = new Date().toISOString();
+                //const now = new Date().toISOString();
 
                 //console.log('BYTES:', [...typedArray].slice(0, 8).map(b => b.toString(16)).join('-'), typedArray);
-                console.log(`[ondataavailable] ${now} -> ${typedArray.length} байт`, typedArray);
+                // console.log(`[ondataavailable] ${now} -> ${typedArray.length} байт`, typedArray);
 
                 const len = typedArray.length;
                 const header = new Uint8Array(2);

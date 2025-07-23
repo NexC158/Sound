@@ -15,10 +15,6 @@ public class Program
 
         app.Services.GetRequiredService<ServerAPI>();
 
-        Console.WriteLine("in client main 2");
-
-        Console.WriteLine("in client main 3");
-
         await app.RunAsync();
     }
 }
