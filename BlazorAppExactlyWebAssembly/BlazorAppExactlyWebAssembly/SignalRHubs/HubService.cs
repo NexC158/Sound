@@ -11,12 +11,12 @@ public class HubService : Hub, IAudioStreamReceiver
         _hubContext = hubContext;
     }
 
-    public async Task TransferInvokeStart() // string method
+    public async Task TransferInvokeStart()
     {
         await _hubContext.Clients.All.OnCustomCommandStart();
     }
 
-    public async Task TransferInvokeStop() // string method
+    public async Task TransferInvokeStop()
     {
         await _hubContext.Clients.All.OnCustomCommandStop();
     }
