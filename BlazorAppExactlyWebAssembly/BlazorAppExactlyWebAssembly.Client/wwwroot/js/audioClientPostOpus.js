@@ -93,7 +93,7 @@ async function startTranslate() {
         streamPages: true,
         maxFramesPerPage: 1,
         rawOpus: true,
-        encoderPath: 'js/forOpusMinJs/raw-opus-stream-recorder/dist/encoderWorker.min.js'
+        encoderPath: 'libs/raw-opus-stream-recorder/dist/encoderWorker.min.js'
     });
 
         console.log('translation request - recorder ' + recorder);
