@@ -17,9 +17,9 @@ public class AudioController : ControllerBase
         var pipe = new Pipe();
         var workPipe = new PipeLineMethods();
         var writing = workPipe.FillPipeAsync(Request.Body, pipe.Writer);
-        var reading = workPipe.ReadPipeAsync(pipe.Reader);
+        _ = workPipe.ReadPipeAsync(pipe.Reader);
 
-        await Task.WhenAll(writing, reading);
+        await Task.WhenAll(writing);
 
         //Console.WriteLine("AudioController UploadStreamWithPipe завершен\n");
 
