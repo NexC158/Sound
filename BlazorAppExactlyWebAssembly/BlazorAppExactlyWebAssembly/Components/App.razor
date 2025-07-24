@@ -15,7 +15,8 @@
 <body>
     <Routes /> @* либо так для всех смотри Audio.razor <Routes @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)"/>*@
     <script src="_framework/blazor.web.js"></script>
-    <script src="signalRlib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="js/forSignalrMinJs/signalr.min.js"></script>
+    @* <script src="signalRlib/microsoft/signalr/dist/browser/signalr.js"></script> *@
     <script src="lib/raw-opus-stream-recorder/dist/recorder.min.js"></script>
     <script src="js/audioClientPostOpus.js"></script>
 

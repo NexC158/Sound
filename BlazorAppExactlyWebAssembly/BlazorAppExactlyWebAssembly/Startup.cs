@@ -17,12 +17,7 @@ public class Startup
 
         services.AddRazorComponents().AddInteractiveWebAssemblyComponents();
 
-        services.AddSignalR().AddMessagePackProtocol(/*options =>  //  AddJsonProtocol()
-        {
-            options.SerializerOptions = MessagePackSerializerOptions.Standard
-                .WithResolver(new CustomResolver())
-                .WithSecurity(MessagePackSecurity.UntrustedData);
-        }*/);
+        services.AddSignalR();
 
         services.AddTransient<ServerAPI>();
 
