@@ -8,7 +8,7 @@ namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
 {
     public class PipeLineMethods
     {
-        private const int _minBufferSize = 256;
+        private const int _minBufferSize = 256; // протестировать с минимально возможным буфером (нужен макс опус фрейм)
         public async Task FillPipeAsync(Stream body, PipeWriter pipeWriter)
         {
             while (true)
@@ -52,8 +52,8 @@ namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
 
                 ProcessBuffer(buffer);
 
-                pipeReader.AdvanceTo(buffer.End);
-
+                pipeReader.AdvanceTo(buffer.End); // переделать buffer.End 
+                                                  // ProcessBuffer должен мне отдать позицию, на которую я буду AdvanceTo
                 if (readResult.IsCompleted)
                 {
                     break;
@@ -89,7 +89,7 @@ namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
                 return false;
             }
 
-            frame = sequenceReader.UnreadSpan.Slice(0, frameLength);
+            frame = sequenceReader.UnreadSpan.Slice(0, frameLength); // посмотреть UnreadSpan и Slice. Тут возможно свинство 
             sequenceReader.Advance(frameLength);
             //Console.WriteLine($"AudioOpusDecodingAndPlay TryReadFrame принял фрейм опуса {frameLength}");
             return true;

@@ -89,12 +89,11 @@ async function startTranslate() {
         streamPages: true,
         maxFramesPerPage: 1,
         rawOpus: true,
-        encoderPath: 'lib/raw-opus-stream-recorder/dist/encoderWorker.min.js'
+        encoderPath: 'js/forOpusMinJs/raw-opus-stream-recorder/dist/encoderWorker.min.js'
     });
 
 
-    recorder.ondataavailable = (typedArray) => { // TODO: реализовать остановку только после того, как передастся то, что уже записывается
-        // на 20 мс это будет незаметно, но вот такой минус тут есть
+    recorder.ondataavailable = (typedArray) => { 
 
         if ((isTransmitting || isStopping) && typedArray.length > 0 && controllerRef) {
 
