@@ -30,6 +30,7 @@ namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
                 catch (Exception ex)
                 {
                     Console.WriteLine($"PipeLineMethods FillPipeAsync ошибка: {ex.ToString()}");
+                    break;
                 }
 
                 FlushResult flushResult = await pipeWriter.FlushAsync();
@@ -39,6 +40,7 @@ namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
                     break;
                 }
             }
+
             await pipeWriter.CompleteAsync();
         }
 
@@ -49,7 +51,12 @@ namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
                 ReadResult readResult = await pipeReader.ReadAsync();
                 ReadOnlySequence<byte> buffer = readResult.Buffer;
 
+                
+
+
                 ProcessBuffer(buffer);
+                // TODO really-processed-position = ProcessBuffer();
+                // TODO piprReader.AdvanceTo(really-processed-position);
 
                 pipeReader.AdvanceTo(buffer.End);
 
@@ -60,6 +67,7 @@ namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
             }
             await pipeReader.CompleteAsync();
         }
+
 
         public static void ProcessBuffer(in ReadOnlySequence<byte> buffer)
         {
@@ -88,6 +96,8 @@ namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
                 return false;
             }
 
+
+            //sequenceReader.CurrentSpan;
             frame = sequenceReader.UnreadSpan.Slice(0, frameLength);
             sequenceReader.Advance(frameLength);
             //Console.WriteLine($"AudioOpusDecodingAndPlay TryReadFrame принял фрейм опуса {frameLength}");

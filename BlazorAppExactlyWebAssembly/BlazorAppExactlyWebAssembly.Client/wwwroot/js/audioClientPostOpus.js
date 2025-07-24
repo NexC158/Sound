@@ -28,6 +28,7 @@ connectionForAudioHub.start();
 
 async function startTranslate() {
 
+    console.log('translation request ...');
     if (isTransmitting) {
         console.log('Передача уже идёт');
         return;
@@ -65,6 +66,8 @@ async function startTranslate() {
         }
     });
 
+    console.log('translation request - before fetch');
+
     fetch('/api/audio/stream', { // отправка потока fetch-ом
 
         method: 'POST',
@@ -76,6 +79,8 @@ async function startTranslate() {
         duplex: "half"
     }).then(res => console.log('поток успешно отправился:', res))
         .catch(err => console.error('Ошибка при отправке:', err));
+
+    console.log('translation request - after fetch');
 
     if (!recorder) {
 
@@ -91,10 +96,12 @@ async function startTranslate() {
         encoderPath: 'js/forOpusMinJs/raw-opus-stream-recorder/dist/encoderWorker.min.js'
     });
 
+        console.log('translation request - recorder ' + recorder);
 
     recorder.ondataavailable = (typedArray) => { // TODO: реализовать остановку только после того, как передастся то, что уже записывается
         // на 20 мс это будет незаметно, но вот такой минус тут есть
 
+            console.log('translation request - on event');
             if (!controllerRef) {
 
                 console.log('Поток закрыт');
@@ -135,7 +142,12 @@ async function startTranslate() {
             }
         };
     }
+
+    console.log('translation request - before recorder start');
+
     await recorder.start(mediaStream);
+
+    console.log('translation request - after recorder start');
 }
 
 
