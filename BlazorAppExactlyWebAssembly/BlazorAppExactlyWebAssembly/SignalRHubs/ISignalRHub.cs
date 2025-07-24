@@ -1,9 +1,5 @@
-﻿using System.Threading.Channels;
-using TypedSignalR.Client;
+﻿namespace BlazorAppExactlyWebAssembly.SignalRHubShared;
 
-namespace BlazorAppExactlyWebAssembly.SignalRHubShared;
-
-[Hub]
 public interface ISignalRHub
 {
     string GetMyConnectionId();

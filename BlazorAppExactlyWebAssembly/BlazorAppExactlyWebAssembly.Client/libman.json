@@ -2,15 +2,6 @@
   "version": "3.0",
   "defaultProvider": "cdnjs",
     "libraries": [
-        {
-            "provider": "jsdelivr",
-            "library": "opus-decoder@latest",
-            "destination": "wwwroot/lib/opus-decoder/"
-        },
-        {
-            "provider": "jsdelivr",
-            "library": "@microsoft/signalr@latest",
-            "destination": "wwwroot/signalRlib/microsoft/signalr/"
-        }
+        
     ]
 }

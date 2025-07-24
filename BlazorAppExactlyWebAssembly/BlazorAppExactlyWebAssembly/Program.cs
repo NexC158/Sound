@@ -1,5 +1,6 @@
 using BlazorAppExactlyWebAssembly.Client.Pages.Internal;
 using BlazorAppExactlyWebAssembly.Components;
+using BlazorAppExactlyWebAssembly.Client;
 using BlazorAppExactlyWebAssembly.SignalRHubShared;
 
 
