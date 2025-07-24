@@ -4,6 +4,6 @@
     "opus-recorder": "^8.0.5"
   },
   "devDependencies": {
-    "@types/node": "^24.0.14"
+    "@types/node": "^24.1.0"
   }
 }

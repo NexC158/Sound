@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Buffers;
+using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using Concentus;
 using Concentus.Structs;
 using NAudio.Wave;
@@ -7,17 +9,17 @@ namespace BlazorAppExactlyWebAssembly.ServerWorkingWithAudio;
 
 public class AudioOpusDecodingAndPlay
 {
-    private static readonly int _sampleRate = 8000; // 8000 16000 24000 
+    private static readonly int _sampleRate = 8000;
     private static readonly int _channels = 1;
     private static readonly int _opusFrameInMiliseconds = 20;
     private static readonly int _numberOfSamples = _sampleRate * _opusFrameInMiliseconds / 1000;
 
     private static IOpusDecoder _decoder = OpusCodecFactory.CreateDecoder(_sampleRate, _channels);
-    private static BufferedWaveProvider _bufferedWaveProvider = null; // хз насчет модификаторов
-    private static WaveOutEvent _waveOut = null;
+    private static BufferedWaveProvider ?_bufferedWaveProvider = null;
+    private static WaveOutEvent ?_waveOut = null;
     private static bool _initialized = false;
 
-    public static void DecodingFrames(byte[] opusFrameData)
+    public static void DecodingFrames(ReadOnlySpan<byte> opusFrameData)
     {
         try
         {            
@@ -27,12 +29,10 @@ public class AudioOpusDecodingAndPlay
                 return; 
             }
 
-            Span<byte> opusSpan = opusFrameData.AsSpan();
             Span<float> pcmFloatSpan = new float[_numberOfSamples];
 
-            int samplesDecoded = _decoder.Decode(opusSpan, pcmFloatSpan, pcmFloatSpan.Length, false); // посмотреть как включить исправление потерь PLS и нужно ли оно вообще
+            int samplesDecoded = _decoder.Decode(opusFrameData, pcmFloatSpan, pcmFloatSpan.Length, false); 
 
-            
             if (samplesDecoded <= 0)
             {
                 Console.WriteLine("Нулевые сэмплы");
@@ -47,12 +47,11 @@ public class AudioOpusDecodingAndPlay
                 float sample = MathF.Max(-1.0f, MathF.Min(1.0f, pcmFloatSpan[i]));
                 short pcmSample = (short)(sample * short.MaxValue);
 
-                pcmBytes[i * 2] = (byte)(pcmSample & 0xFF);        // младший байт
-                pcmBytes[i * 2 + 1] = (byte)((pcmSample >> 8) & 0xFF); // старший байт
+                pcmBytes[i * 2] = (byte)(pcmSample & 0xFF);
+                pcmBytes[i * 2 + 1] = (byte)((pcmSample >> 8) & 0xFF);
             }
-            //MemoryMarshal.Cast<float, byte>(pcmFloatSpan.Slice(0, samplesDecoded)).CopyTo(pcmBytes); // только для выхода в формате float32\
 
-            PlayChunksSound(pcmBytes);
+            PlaySound(pcmBytes);
         }
         catch (Exception ex)
         {
@@ -60,7 +59,7 @@ public class AudioOpusDecodingAndPlay
         }
     }
 
-    public static void PlayChunksSound(byte[] pcmBytes)
+    public static void PlaySound(byte[] pcmBytes)
     {
         if (!_initialized)
         {
@@ -68,15 +67,15 @@ public class AudioOpusDecodingAndPlay
 
             _bufferedWaveProvider = new BufferedWaveProvider(waveFormat)
             {
-                BufferLength = 4096, // минимально допустимый буфер
-                BufferDuration = TimeSpan.FromMilliseconds(100), // если поддерживается
+                BufferLength = 4096, // минимально допустимый
+                BufferDuration = TimeSpan.FromMilliseconds(100),
                 DiscardOnBufferOverflow = true
             };
 
             _waveOut = new WaveOutEvent()
             {
-                DesiredLatency = 50,       // настоятельно рекомендую
-                NumberOfBuffers = 3       // меньше буферов = ниже задержка, но больше шанс заикания
+                DesiredLatency = 50,
+                NumberOfBuffers = 3
             };
 
             _waveOut.Init(_bufferedWaveProvider);
@@ -85,7 +84,6 @@ public class AudioOpusDecodingAndPlay
             _initialized = true;
         }
 
-        _bufferedWaveProvider.AddSamples(pcmBytes, 0, pcmBytes.Length);
-
+        _bufferedWaveProvider?.AddSamples(pcmBytes, 0, pcmBytes.Length);
     }
 }
