@@ -81,18 +81,19 @@ async function startTranslate() {
 
         recorder = new Recorder({
 
-            encoderSampleRate: 8000,
-            encoderFrameSize: 20,
-            // bitrate: 16000, // 16000
-            // cbr: true,
-            streamPages: true,
-            maxFramesPerPage: 1,
-            rawOpus: true,
-            encoderPath: 'lib/raw-opus-stream-recorder/dist/encoderWorker.min.js'
-        });
+        encoderSampleRate: 8000,
+        encoderFrameSize: 20,
+        // bitrate: 16000, // 16000
+        // cbr: true,
+        streamPages: true,
+        maxFramesPerPage: 1,
+        rawOpus: true,
+        encoderPath: 'js/forOpusMinJs/raw-opus-stream-recorder/dist/encoderWorker.min.js'
+    });
 
 
-        recorder.ondataavailable = (typedArray) => {
+    recorder.ondataavailable = (typedArray) => { // TODO: реализовать остановку только после того, как передастся то, что уже записывается
+        // на 20 мс это будет незаметно, но вот такой минус тут есть
 
             if (!controllerRef) {
 
