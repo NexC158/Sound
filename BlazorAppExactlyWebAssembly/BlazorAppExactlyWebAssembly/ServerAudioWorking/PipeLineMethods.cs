@@ -4,104 +4,97 @@ using System.IO.Pipelines;
 using System.Net.Sockets;
 using BlazorAppExactlyWebAssembly.ServerWorkingWithAudio;
 
-namespace BlazorAppExactlyWebAssembly.ServerAudioWorking
+namespace BlazorAppExactlyWebAssembly.ServerAudioWorking;
+
+public class PipeLineMethods
 {
-    public class PipeLineMethods
+    private const int _minBufferSize = 256;
+    public async Task FillPipeAsync(Stream body, PipeWriter pipeWriter)
     {
-        private const int _minBufferSize = 256;
-        public async Task FillPipeAsync(Stream body, PipeWriter pipeWriter)
+        while (true)
         {
-            while (true)
+            try
             {
-                try
+                Memory<byte> memory = pipeWriter.GetMemory(_minBufferSize);
+
+                int bytesRead = await body.ReadAsync(memory);
+
+                if (bytesRead == 0)
                 {
-                    Memory<byte> memory = pipeWriter.GetMemory(_minBufferSize);
-
-                    int bytesRead = await body.ReadAsync(memory);
-
-                    if (bytesRead == 0)
-                    {
-                        Console.WriteLine("PipeLineMethods FillPipeAsync прочитано 0 байт");
-                        break;
-                    }
-
-                    pipeWriter.Advance(bytesRead);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"PipeLineMethods FillPipeAsync ошибка: {ex.ToString()}");
+                    Console.WriteLine("PipeLineMethods FillPipeAsync прочитано 0 байт");
                     break;
                 }
 
-                FlushResult flushResult = await pipeWriter.FlushAsync();
-
-                if(flushResult.IsCompleted)
-                {
-                    break;
-                }
+                pipeWriter.Advance(bytesRead);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"PipeLineMethods FillPipeAsync ошибка: {ex.ToString()}");
+                break;
             }
 
-            await pipeWriter.CompleteAsync();
-        }
+            FlushResult flushResult = await pipeWriter.FlushAsync();
 
-        public async Task ReadPipeAsync(PipeReader pipeReader)
+            if(flushResult.IsCompleted)
+            {
+                break;
+            }
+        }
+        await pipeWriter.CompleteAsync();
+    }
+
+    public async Task ReadPipeAsync(PipeReader pipeReader)
+    {
+        while (true)
         {
-            while (true)
+            ReadResult readResult = await pipeReader.ReadAsync();
+            ReadOnlySequence<byte> buffer = readResult.Buffer;
+
+            var consumed = ProcessBuffer(buffer);            
+
+            pipeReader.AdvanceTo(consumed, buffer.End);
+
+            if (readResult.IsCompleted)
             {
-                ReadResult readResult = await pipeReader.ReadAsync();
-                ReadOnlySequence<byte> buffer = readResult.Buffer;
-
-                
-
-
-                ProcessBuffer(buffer);
-                // TODO really-processed-position = ProcessBuffer();
-                // TODO piprReader.AdvanceTo(really-processed-position);
-
-                pipeReader.AdvanceTo(buffer.End);
-
-                if (readResult.IsCompleted)
-                {
-                    break;
-                }
+                break;
             }
-            await pipeReader.CompleteAsync();
         }
+        await pipeReader.CompleteAsync();
+    }
 
+    public static SequencePosition ProcessBuffer(in ReadOnlySequence<byte> buffer) 
+    {
+        var reader = new SequenceReader<byte>(buffer);
+        var consumed = buffer.Start;
 
-        public static void ProcessBuffer(in ReadOnlySequence<byte> buffer)
+        while (TryReadFrame(ref reader, out ReadOnlySpan<byte> frame))
         {
-            var reader = new SequenceReader<byte>(buffer);
-
-            while (TryReadFrame(ref reader, out ReadOnlySpan<byte> frame))
-            {
-                AudioOpusDecodingAndPlay.DecodingFrames(frame);
-            }
+            AudioOpusDecodingAndPlay.DecodingFrames(frame);
+            consumed = reader.Position;
         }
+        return consumed;
+    }
 
-        public static bool TryReadFrame(ref SequenceReader<byte> sequenceReader, out ReadOnlySpan<byte> frame)
+    public static bool TryReadFrame(ref SequenceReader<byte> sequenceReader, out ReadOnlySpan<byte> frame)
+    {
+        frame = default;
+
+        short frameLength;
+
+        if (!sequenceReader.TryReadLittleEndian(out frameLength))
         {
-            frame = default;
-
-            short frameLength;
-
-            if (!sequenceReader.TryReadLittleEndian(out frameLength))
-            {
-                return false;
-            }
-
-            if (sequenceReader.Remaining < frameLength)
-            {
-                sequenceReader.Rewind(2);
-                return false;
-            }
-
-
-            //sequenceReader.CurrentSpan;
-            frame = sequenceReader.UnreadSpan.Slice(0, frameLength);
-            sequenceReader.Advance(frameLength);
-            //Console.WriteLine($"AudioOpusDecodingAndPlay TryReadFrame принял фрейм опуса {frameLength}");
-            return true;
+            return false;
         }
+
+        if (sequenceReader.Remaining < frameLength)
+        {
+            sequenceReader.Rewind(2);
+            return false;
+        }
+
+        frame = sequenceReader.UnreadSpan.Slice(0, frameLength);
+        sequenceReader.Advance(frameLength);
+
+        return true;
     }
 }
